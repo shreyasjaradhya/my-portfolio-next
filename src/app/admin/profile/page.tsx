@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/queries";
 import ProfileForm from "./ProfileForm";
 import styles from "./profile.module.css";
@@ -11,16 +11,17 @@ export const metadata = {
 
 export default async function AdminProfilePage() {
   const supabase = await createClient();
+  const publicSupabase = createPublicClient();
   
-  // Verify authentication
+  // Verify authentication securely via authenticated client
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
     redirect("/admin/login");
   }
 
-  // Fetch the existing profile data
-  const { data: profile, error: profileError } = await getProfile(supabase);
+  // Fetch the existing profile data using the public client (since anon has SELECT, but authenticated lacks it in 003)
+  const { data: profile, error: profileError } = await getProfile(publicSupabase);
 
   if (profileError || !profile) {
     return (
