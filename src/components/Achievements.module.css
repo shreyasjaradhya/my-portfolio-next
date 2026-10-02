@@ -1,0 +1,147 @@
+.section {
+  padding: 8rem 2rem;
+  background: var(--bg-secondary); /* Alternate background */
+  position: relative;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.heading {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 4rem;
+  color: var(--text-primary);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  width: 2px;
+  background: var(--border-light);
+}
+
+.card {
+  position: relative;
+  padding-left: 4rem;
+}
+
+.node {
+  position: absolute;
+  left: 17px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-accent);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.card:hover .node {
+  background: var(--text-accent);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+
+.content {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover .content {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: var(--text-accent);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  padding: 0.25rem 0.75rem;
+  background: rgba(56, 189, 248, 0.1);
+  border-radius: 20px;
+}
+
+.description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.linkBtn:hover {
+  color: var(--text-accent);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 6rem 1.5rem;
+  }
+  
+  .timeline::before {
+    left: 12px;
+  }
+  
+  .node {
+    left: 5px;
+    width: 14px;
+    height: 14px;
+  }
+  
+  .card {
+    padding-left: 2.5rem;
+  }
+  
+  .titleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
