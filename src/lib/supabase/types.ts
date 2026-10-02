@@ -96,3 +96,15 @@ export interface Message {
   status: string;
   created_at: string;
 }
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string | null;
+  company: string | null;
+  content: string;
+  rating: number | null;
+  avatar_url: string | null;
+  display_order: number;
+  created_at: string;
+}

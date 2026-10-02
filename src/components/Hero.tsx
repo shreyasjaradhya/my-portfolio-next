@@ -56,6 +56,16 @@ export default function Hero({ profile }: { profile: Profile | null }) {
           <Link href="#about" className={styles.secondaryBtn}>
             About Me
           </Link>
+          {profile.resume_url && (
+            <a 
+              href={profile.resume_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={styles.secondaryBtn}
+            >
+              Resume
+            </a>
+          )}
         </motion.div>
 
         <motion.div 

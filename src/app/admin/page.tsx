@@ -26,6 +26,7 @@ export default async function AdminDashboard() {
     { count: educationCount },
     { count: certificationsCount },
     { count: achievementsCount },
+    { count: testimonialsCount },
     { count: totalMessagesCount },
     { count: unreadMessagesCount },
     { data: recentMessages }
@@ -36,6 +37,7 @@ export default async function AdminDashboard() {
     supabase.from("education").select("*", { count: 'exact', head: true }),
     supabase.from("certifications").select("*", { count: 'exact', head: true }),
     supabase.from("achievements").select("*", { count: 'exact', head: true }),
+    supabase.from("testimonials").select("*", { count: 'exact', head: true }),
     supabase.from("messages").select("*", { count: 'exact', head: true }),
     supabase.from("messages").select("*", { count: 'exact', head: true }).eq("status", "unread"),
     supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(5)
@@ -132,6 +134,14 @@ export default async function AdminDashboard() {
               </div>
               <span className={styles.statValue}>{achievementsCount ?? '—'}</span>
             </Link>
+
+            <Link href="/admin/testimonials" className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statIcon} aria-hidden="true">💬</span>
+                <span className={styles.statLabel}>Testimonials</span>
+              </div>
+              <span className={styles.statValue}>{testimonialsCount ?? "-"}</span>
+            </Link>
           </div>
 
           {/* Side Panel */}
@@ -148,6 +158,7 @@ export default async function AdminDashboard() {
                 <Link href="/admin/education" className={styles.actionLink}>Manage Education</Link>
                 <Link href="/admin/certifications" className={styles.actionLink}>Manage Certifications</Link>
                 <Link href="/admin/achievements" className={styles.actionLink}>Manage Achievements</Link>
+                <Link href="/admin/testimonials" className={styles.actionLink}>Manage Testimonials</Link>
               </div>
             </section>
 

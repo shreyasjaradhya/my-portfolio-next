@@ -6,7 +6,8 @@ import type {
   Experience, 
   Education, 
   Certification, 
-  Achievement 
+  Achievement,
+  Testimonial
 } from './types';
 
 /**
@@ -76,5 +77,11 @@ export async function getCertifications(supabase: SupabaseClient) {
 export async function getAchievements(supabase: SupabaseClient) {
   return fetchFromTable<Achievement>(
     supabase.from('achievements').select('*').order('display_order', { ascending: true })
+  );
+}
+
+export async function getTestimonials(supabase: SupabaseClient) {
+  return fetchFromTable<Testimonial>(
+    supabase.from('testimonials').select('*').order('display_order', { ascending: true })
   );
 }

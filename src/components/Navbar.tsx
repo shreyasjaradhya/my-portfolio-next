@@ -3,6 +3,7 @@ import * as motion from "framer-motion/client";
 import styles from "./Navbar.module.css";
 import Link from "next/link";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 import type { Profile } from "@/lib/supabase/types";
 
 export default function Navbar({ profile }: { profile: Profile | null }) {
@@ -35,18 +36,32 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
               {link.name}
             </Link>
           ))}
+          {profile?.resume_url && (
+            <a 
+              href={profile.resume_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={styles.navLink}
+            >
+              Resume
+            </a>
+          )}
         </div>
 
-        <button 
-          className={styles.mobileMenuBtn} 
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle Menu"
-        >
-          <span className={styles.hamburger} style={{ background: isOpen ? 'transparent' : 'var(--text-primary)'}}>
-             <span className={isOpen ? styles.cross1 : ''}></span>
-             <span className={isOpen ? styles.cross2 : ''}></span>
-          </span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ThemeToggle />
+          
+          <button 
+            className={styles.mobileMenuBtn} 
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle Menu"
+          >
+            <span className={styles.hamburger} style={{ background: isOpen ? 'transparent' : 'var(--text-primary)'}}>
+               <span className={isOpen ? styles.cross1 : ''}></span>
+               <span className={isOpen ? styles.cross2 : ''}></span>
+            </span>
+          </button>
+        </div>
       </div>
 
       {isOpen && (
@@ -65,6 +80,17 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
               {link.name}
             </Link>
           ))}
+          {profile?.resume_url && (
+            <a 
+              href={profile.resume_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={styles.mobileNavLink}
+              onClick={() => setIsOpen(false)}
+            >
+              Resume
+            </a>
+          )}
         </motion.div>
       )}
     </motion.nav>

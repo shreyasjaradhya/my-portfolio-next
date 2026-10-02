@@ -6,6 +6,7 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Certifications from "@/components/Certifications";
 import Achievements from "@/components/Achievements";
+import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { createPublicClient } from "@/lib/supabase/server";
@@ -17,7 +18,8 @@ import {
   getExperiences, 
   getEducation, 
   getCertifications, 
-  getAchievements 
+  getAchievements,
+  getTestimonials
 } from "@/lib/supabase/queries";
 
 export const revalidate = 60; // optionally revalidate every 60 seconds
@@ -32,7 +34,8 @@ export default async function Home() {
     experiencesRes,
     educationRes,
     certificationsRes,
-    achievementsRes
+    achievementsRes,
+    testimonialsRes
   ] = await Promise.all([
     getProfile(supabase),
     getProjects(supabase),
@@ -40,7 +43,8 @@ export default async function Home() {
     getExperiences(supabase),
     getEducation(supabase),
     getCertifications(supabase),
-    getAchievements(supabase)
+    getAchievements(supabase),
+    getTestimonials(supabase)
   ]);
 
 
@@ -55,6 +59,7 @@ export default async function Home() {
         <Experience experiences={experiencesRes.data || []} />
         <Certifications certifications={certificationsRes.data || []} />
         <Achievements achievements={achievementsRes.data || []} />
+        <Testimonials testimonials={testimonialsRes.data || []} />
         <Contact profile={profileRes.data} />
       </main>
       <Footer profile={profileRes.data} />
