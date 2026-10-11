@@ -53,7 +53,12 @@ export default async function Home() {
       <Navbar profile={profileRes.data} />
       <main>
         <Hero profile={profileRes.data} />
-        <About profile={profileRes.data} education={educationRes.data || []} />
+        <About 
+          profile={profileRes.data} 
+          education={educationRes.data || []} 
+          experiences={experiencesRes.data || []}
+          projectsCount={projectsRes.data?.length || 0}
+        />
         <Skills skills={skillsRes.data || []} />
         <Projects projects={projectsRes.data || []} />
         <Experience experiences={experiencesRes.data || []} />

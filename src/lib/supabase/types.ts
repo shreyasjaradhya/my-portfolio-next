@@ -47,6 +47,7 @@ export interface Experience {
   end_date: string | null;
   description: string | null;
   technologies: string[] | null;
+  image_url?: string | null;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -73,6 +74,10 @@ export interface Certification {
   credential_url: string | null;
   certificate_url: string | null;
   description: string | null;
+  tags?: string[] | null;
+  issuer_logo_url?: string | null;
+  callout?: string | null;
+  action_label?: string | null;
   display_order: number;
   created_at: string;
 }

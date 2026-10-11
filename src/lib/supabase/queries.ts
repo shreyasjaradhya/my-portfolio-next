@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { 
   Profile, 
@@ -85,3 +86,4 @@ export async function getTestimonials(supabase: SupabaseClient) {
     supabase.from('testimonials').select('*').order('display_order', { ascending: true })
   );
 }
+

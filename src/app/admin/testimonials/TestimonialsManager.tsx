@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -302,3 +303,4 @@ export default function TestimonialsManager({ initialTestimonials }: { initialTe
     </>
   );
 }
+

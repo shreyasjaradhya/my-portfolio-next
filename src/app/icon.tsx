@@ -1,6 +1,6 @@
-import { ImageResponse } from 'next/og';
+﻿import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // Image metadata
 export const size = {
@@ -33,3 +33,4 @@ export default function Icon() {
     { ...size }
   );
 }
+

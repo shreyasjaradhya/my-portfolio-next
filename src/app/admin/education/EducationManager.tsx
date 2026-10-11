@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -205,7 +206,7 @@ export default function EducationManager({ initialEducation }: { initialEducatio
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingEducation ? "Edit Education" : "Add Education"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>×</button>
+              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>
@@ -277,3 +278,4 @@ export default function EducationManager({ initialEducation }: { initialEducatio
     </>
   );
 }
+

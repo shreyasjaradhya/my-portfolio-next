@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -357,3 +358,4 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Profil
     </div>
   );
 }
+

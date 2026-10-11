@@ -15,6 +15,7 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
     { name: "Skills", href: "#skills" },
     { name: "Projects", href: "#projects" },
     { name: "Experience", href: "#experience" },
+    { name: "Certificates", href: "#certifications" },
     { name: "Contact", href: "#contact" },
   ];
 

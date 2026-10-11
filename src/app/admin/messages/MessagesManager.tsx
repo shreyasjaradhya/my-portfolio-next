@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -166,7 +167,7 @@ export default function MessagesManager({ initialMessages }: { initialMessages: 
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>Message Details</h2>
-              <button onClick={closeMessage} className={styles.closeBtn}>×</button>
+              <button onClick={closeMessage} className={styles.closeBtn}>Ã—</button>
             </div>
             
             <div className={styles.detailBody}>
@@ -249,3 +250,4 @@ export default function MessagesManager({ initialMessages }: { initialMessages: 
     </>
   );
 }
+

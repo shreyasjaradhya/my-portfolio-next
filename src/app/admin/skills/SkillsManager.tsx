@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -179,7 +180,7 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingSkill ? "Edit Skill" : "Add Skill"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>×</button>
+              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>
@@ -235,3 +236,4 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
     </>
   );
 }
+

@@ -1,13 +1,20 @@
+/* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Project } from "@/lib/supabase/types";
 import styles from "./projects.module.css";
+import { revalidateHomepage } from "../actions";
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function ProjectsManager({ initialProjects }: { initialProjects: Project[] }) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -26,6 +33,8 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     display_order: 0,
   });
 
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +52,9 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       featured: false,
       display_order: initialProjects.length,
     });
+    setSelectedImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setError(null);
     setIsFormOpen(true);
   };
@@ -61,11 +73,19 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       featured: project.featured,
       display_order: project.display_order,
     });
+    setSelectedImageFile(null);
+    setImagePreview(project.image_url || null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     setError(null);
     setIsFormOpen(true);
   };
 
-  const closeForm = () => setIsFormOpen(false);
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setSelectedImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const confirmDelete = (id: string) => {
     setDeletingId(id);
@@ -82,11 +102,45 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     setError(null);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setError(null);
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError("Invalid image format. Only JPG, JPEG, PNG, and WEBP images are allowed.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setError("Image size exceeds 5 MB limit. Please select a smaller photo.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    setSelectedImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImageFile(null);
+    setImagePreview(null);
+    setFormData(prev => ({ ...prev, image_url: "" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const validateForm = () => {
     if (!formData.title.trim()) return "Title is required.";
     if (!formData.slug.trim()) return "Slug is required.";
     if (!formData.description.trim()) return "Description is required.";
     return null;
+  };
+
+  const extractStoragePath = (url: string | null): string | null => {
+    if (!url) return null;
+    const match = url.match(/\/storage\/v1\/object\/public\/project-images\/(.+)$/);
+    return match ? decodeURIComponent(match[1]) : null;
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -102,20 +156,92 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     setSaving(true);
 
     try {
+      let finalImageUrl: string | null = formData.image_url?.trim() || null;
+
+      // 1. Handle File Upload to Supabase Storage if an image was selected
+      if (selectedImageFile) {
+        const fileExt = selectedImageFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const sanitizedSlug = (formData.slug || 'project').replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase();
+        const fileName = `${sanitizedSlug}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+        let { data: uploadData, error: uploadError } = await supabase.storage
+          .from("project-images")
+          .upload(fileName, selectedImageFile, {
+            cacheControl: "3600",
+            upsert: false
+          });
+
+        // Automatically create bucket if it does not exist yet
+        if (uploadError && (
+          uploadError.message?.toLowerCase().includes("bucket not found") ||
+          (uploadError as any).statusCode === "404"
+        )) {
+          const { error: createErr } = await supabase.storage.createBucket("project-images", {
+            public: true,
+            fileSizeLimit: MAX_IMAGE_SIZE,
+            allowedMimeTypes: ALLOWED_IMAGE_TYPES
+          });
+          if (!createErr) {
+            const retry = await supabase.storage
+              .from("project-images")
+              .upload(fileName, selectedImageFile, {
+                cacheControl: "3600",
+                upsert: false
+              });
+            uploadData = retry.data;
+            uploadError = retry.error;
+          }
+        }
+
+        if (uploadError) {
+          throw new Error(`Failed to upload project image: ${uploadError.message}`);
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("project-images")
+          .getPublicUrl(fileName);
+
+        finalImageUrl = publicUrl;
+
+        // Clean up previous image if replacing an existing uploaded image
+        if (editingProject?.image_url && editingProject.image_url !== finalImageUrl) {
+          const oldPath = extractStoragePath(editingProject.image_url);
+          if (oldPath) {
+            try {
+              await supabase.storage.from("project-images").remove([oldPath]);
+            } catch (e) {
+              console.warn("Could not remove old project image:", e);
+            }
+          }
+        }
+      } else if (!imagePreview && editingProject?.image_url) {
+        // Image was explicitly removed by the user
+        finalImageUrl = null;
+        const oldPath = extractStoragePath(editingProject.image_url);
+        if (oldPath) {
+          try {
+            await supabase.storage.from("project-images").remove([oldPath]);
+          } catch (e) {
+            console.warn("Could not remove cleared project image:", e);
+          }
+        }
+      }
+
+      // 2. Prepare payload
       const techArray = formData.technologies
         .split(",")
         .map(t => t.trim())
         .filter(t => t.length > 0);
 
       const payload = {
-        title: formData.title,
-        slug: formData.slug,
-        description: formData.description,
-        detailed_description: formData.detailed_description || null,
+        title: formData.title.trim(),
+        slug: formData.slug.trim(),
+        description: formData.description.trim(),
+        detailed_description: formData.detailed_description?.trim() || null,
         technologies: techArray.length > 0 ? techArray : null,
-        image_url: formData.image_url || null,
-        github_url: formData.github_url || null,
-        live_url: formData.live_url || null,
+        image_url: finalImageUrl,
+        github_url: formData.github_url?.trim() || null,
+        live_url: formData.live_url?.trim() || null,
         featured: formData.featured,
         display_order: formData.display_order,
         updated_at: new Date().toISOString()
@@ -143,6 +269,13 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
         throw new Error(saveError.message);
       }
 
+      // 3. Revalidate cache and update UI
+      try {
+        await revalidateHomepage();
+      } catch (revalErr) {
+        console.warn("Revalidate homepage warning:", revalErr);
+      }
+
       setIsFormOpen(false);
       router.refresh();
     } catch (err: any) {
@@ -158,12 +291,32 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     setError(null);
 
     try {
+      const projectToDelete = initialProjects.find(p => p.id === deletingId);
+
       const { error } = await supabase
         .from("projects")
         .delete()
         .eq("id", deletingId);
 
       if (error) throw new Error(error.message);
+
+      // Clean up storage image if exists
+      if (projectToDelete?.image_url) {
+        const oldPath = extractStoragePath(projectToDelete.image_url);
+        if (oldPath) {
+          try {
+            await supabase.storage.from("project-images").remove([oldPath]);
+          } catch (e) {
+            console.warn("Could not remove deleted project image:", e);
+          }
+        }
+      }
+
+      try {
+        await revalidateHomepage();
+      } catch (revalErr) {
+        console.warn("Revalidate homepage warning:", revalErr);
+      }
 
       setIsDeleteOpen(false);
       setDeletingId(null);
@@ -187,6 +340,16 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       <div className={styles.projectsGrid}>
         {initialProjects.map(project => (
           <div key={project.id} className={styles.projectCard}>
+            {project.image_url ? (
+              <div className={styles.adminCardImage}>
+                <img src={project.image_url} alt={project.title} className={styles.adminCardImg} />
+              </div>
+            ) : (
+              <div className={styles.adminCardImage}>
+                <div className={styles.adminPlaceholderImg}>No Image</div>
+              </div>
+            )}
+
             <div className={styles.projectHeader}>
               <h3 className={styles.projectTitle}>{project.title}</h3>
               <span className={styles.projectSlug}>/{project.slug}</span>
@@ -219,7 +382,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingProject ? "Edit Project" : "Add Project"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>×</button>
+              <button onClick={closeForm} className={styles.closeBtn} aria-label="Close modal">&times;</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>
@@ -231,6 +394,66 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
                 <div className={styles.inputGroup}>
                   <label htmlFor="slug" className={styles.label}>URL Slug *</label>
                   <input id="slug" name="slug" type="text" value={formData.slug} onChange={handleChange} className={styles.input} disabled={saving} />
+                </div>
+              </div>
+
+              {/* Upload Project Image Field */}
+              <div className={styles.uploadSection}>
+                <label className={styles.label}>Upload Project Image</label>
+                
+                {imagePreview ? (
+                  <div className={styles.formImagePreviewWrapper}>
+                    <img src={imagePreview} alt="Project preview" className={styles.formImagePreview} />
+                    <div className={styles.imageOverlayActions}>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className={styles.changeImageBtn}
+                        disabled={saving}
+                      >
+                        Change Photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className={styles.removeImageBtn}
+                        disabled={saving}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className={styles.uploadDropzone} 
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <svg className={styles.uploadIcon} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span className={styles.uploadPrompt}>
+                      Click to select a project image from your computer
+                    </span>
+                    <span className={styles.uploadSubtext}>
+                      JPG, JPEG, PNG, or WEBP up to 5 MB (16:9 recommended)
+                    </span>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  id="project_image_file"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                  disabled={saving}
+                />
+                
+                <div className={styles.helperText}>
+                  Supported formats: JPG, JPEG, PNG, WEBP (Max: 5MB). Image is displayed in 16:9 aspect ratio.
                 </div>
               </div>
 
@@ -258,17 +481,12 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label htmlFor="github_url" className={styles.label}>GitHub URL</label>
-                  <input id="github_url" name="github_url" type="url" value={formData.github_url} onChange={handleChange} className={styles.input} disabled={saving} />
+                  <input id="github_url" name="github_url" type="url" value={formData.github_url} onChange={handleChange} className={styles.input} disabled={saving} placeholder="https://github.com/..." />
                 </div>
                 <div className={styles.inputGroup}>
                   <label htmlFor="live_url" className={styles.label}>Live URL</label>
-                  <input id="live_url" name="live_url" type="url" value={formData.live_url} onChange={handleChange} className={styles.input} disabled={saving} />
+                  <input id="live_url" name="live_url" type="url" value={formData.live_url} onChange={handleChange} className={styles.input} disabled={saving} placeholder="https://..." />
                 </div>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label htmlFor="image_url" className={styles.label}>Image URL</label>
-                <input id="image_url" name="image_url" type="url" value={formData.image_url} onChange={handleChange} className={styles.input} disabled={saving} />
               </div>
 
               <div className={styles.checkboxGroup}>

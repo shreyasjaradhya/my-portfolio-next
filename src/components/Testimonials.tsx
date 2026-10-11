@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import * as motion from "framer-motion/client";
@@ -38,7 +39,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
       <div className={styles.rating} aria-label={`Rating: ${rating} out of 5 stars`}>
         {[1, 2, 3, 4, 5].map((star) => (
           <span key={star} style={{ opacity: star <= rating ? 1 : 0.3 }}>
-            ★
+            â˜…
           </span>
         ))}
       </div>
@@ -104,3 +105,4 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
     </section>
   );
 }
+

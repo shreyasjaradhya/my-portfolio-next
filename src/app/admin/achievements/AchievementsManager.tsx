@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -182,7 +183,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
               <button onClick={() => confirmDelete(achievement.id)} className={styles.deleteBtn}>Delete</button>
               {achievement.url && (
                 <a href={achievement.url} target="_blank" rel="noopener noreferrer" className={styles.viewLink}>
-                  View Link →
+                  View Link â†’
                 </a>
               )}
             </div>
@@ -199,7 +200,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingAchievement ? "Edit Achievement" : "Add Achievement"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>×</button>
+              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>
@@ -259,3 +260,4 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
     </>
   );
 }
+

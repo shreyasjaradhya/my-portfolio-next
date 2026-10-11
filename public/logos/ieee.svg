@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- IEEE Diamond Kite -->
+  <path d="M 28 8 L 48 30 L 28 52 L 8 30 Z" fill="#00629B"/>
+  <path d="M 28 14 L 42 30 L 28 46 L 14 30 Z" fill="#ffffff"/>
+  <circle cx="28" cy="30" r="9" fill="#00629B"/>
+  <path d="M 24 30 L 32 30 M 28 26 L 28 34" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 28 16 L 36 24 M 20 36 L 28 44" stroke="#00629B" stroke-width="1.5"/>
+  <!-- IEEE Text -->
+  <text x="56" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="900" fill="#00629B" letter-spacing="-0.5">IEEE</text>
+  <!-- Subtitle -->
+  <text x="56" y="46" font-family="system-ui, -apple-system, sans-serif" font-size="6.5" font-weight="600" fill="#00629B" letter-spacing="0.2">Advancing Technology</text>
+  <text x="56" y="53" font-family="system-ui, -apple-system, sans-serif" font-size="6.5" font-weight="600" fill="#00629B" letter-spacing="0.2">for Humanity</text>
+</svg>

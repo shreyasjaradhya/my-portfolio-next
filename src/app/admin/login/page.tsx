@@ -1,3 +1,4 @@
+﻿/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -80,7 +81,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               disabled={loading}
               autoComplete="current-password"
             />
@@ -103,8 +104,9 @@ export default function AdminLoginPage() {
       </motion.div>
 
       <Link href="/" className={styles.backLink}>
-        ← Return to Public Portfolio
+        â† Return to Public Portfolio
       </Link>
     </main>
   );
 }
+

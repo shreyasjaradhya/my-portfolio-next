@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+  <g transform="translate(10, 5)">
+    <!-- AIM Graphic in bright yellow/gold -->
+    <text x="5" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="34" font-weight="900" fill="#EAB308" letter-spacing="-1">AIM</text>
+    <path d="M 72 12 L 84 38 L 96 12 Z" fill="#EAB308" opacity="0.9"/>
+    <!-- NITI Aayog / Innovation small text -->
+    <text x="5" y="47" font-family="system-ui, -apple-system, sans-serif" font-size="6" font-weight="700" fill="#71717A" letter-spacing="1.5">ATAL INNOVATION MISSION</text>
+  </g>
+</svg>

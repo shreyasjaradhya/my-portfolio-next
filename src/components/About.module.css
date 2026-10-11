@@ -2,126 +2,281 @@
   padding: 8rem 2rem;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-light);
+  position: relative;
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
+/* 1. Section Heading: Centered */
 .header {
+  text-align: center;
   margin-bottom: 4rem;
 }
 
-.heading {
-  font-size: 2.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
 }
 
+.heading {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* 2. Main Content Layout: Two-Column */
 .aboutWrapper {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  align-items: center;
+  gap: 3.5rem;
 }
 
 @media (min-width: 1024px) {
   .aboutWrapper {
     flex-direction: row;
     align-items: flex-start;
-    gap: 4rem;
-  }
-
-  .imageColumn {
-    flex: 0 0 350px;
-    max-width: 350px;
-  }
-
-  .content {
-    flex: 1;
-    max-width: 600px;
+    justify-content: center;
+    gap: 4.5rem;
   }
 }
 
-.content {
+/* LEFT COLUMN — PROFILE PHOTO */
+.imageColumn {
+  flex: 0 0 320px;
+  width: 320px;
+  max-width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-}
-
-.textContent {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: var(--text-secondary);
-}
-
-.infoCard {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.infoCard:hover {
-  transform: translateY(-2px);
-  border-color: var(--text-accent);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.infoRow {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.infoLabel {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.infoValue {
-  font-size: 1rem;
-  color: var(--text-primary);
-  font-weight: 500;
+  justify-content: center;
 }
 
 .imageFrame {
-  position: relative;
-  border-radius: 16px;
-  padding: 10px;
-  background: var(--bg-glass);
+  width: 320px;
+  height: 500px;
+  max-width: 100%;
+  border-radius: 38px;
+  overflow: hidden;
   border: 1px solid var(--border-light);
+  background: var(--bg-glass);
   box-shadow: var(--glow-shadow);
-  transition: border-color 0.3s ease;
-}
-
-.imageFrame::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--border-glow), transparent 60%);
-  z-index: -1;
-  opacity: 0.5;
+  position: relative;
 }
 
 .profileImage {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
+  height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 38px;
+}
+
+.placeholderPhoto {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+}
+
+/* RIGHT COLUMN — CARDS & BIO */
+.contentColumn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Three Cards in a Horizontal Row */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.card {
+  background: var(--bg-glass);
   border: 1px solid var(--border-light);
+  border-radius: 30px;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  min-height: 170px;
+}
+
+:root[data-theme='dark'] .card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='light'] .card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.card:hover {
+  border-color: var(--text-accent);
+  box-shadow: var(--glow-shadow);
+  transform: translateY(-4px);
+}
+
+.cardIcon {
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+
+.cardPrimaryText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.cardSecondaryText {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+/* BIO UNDER THE CARDS */
+.bioWrapper {
+  margin-top: 40px; /* 35-45px space */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 20px paragraph separation */
+}
+
+.bioParagraph {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  text-align: left;
+  word-break: break-word;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1100px) {
+  .cardsGrid {
+    gap: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem 1rem;
+    border-radius: 26px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .aboutWrapper {
+    gap: 3rem;
+  }
+
+  .imageColumn {
+    width: 290px;
+  }
+
+  .imageFrame {
+    width: 290px;
+    height: 450px;
+    border-radius: 34px;
+  }
+
+  .profileImage {
+    border-radius: 34px;
+  }
+
+  .contentColumn {
+    width: 100%;
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutSection {
+    padding: 5rem 1.5rem;
+  }
+
+  .header {
+    margin-bottom: 3rem;
+  }
+
+  .heading {
+    font-size: 2.25rem;
+  }
+
+  .imageColumn {
+    width: 260px;
+  }
+
+  .imageFrame {
+    width: 260px;
+    height: 380px;
+    border-radius: 32px;
+  }
+
+  .profileImage {
+    border-radius: 32px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .card {
+    border-radius: 22px;
+    padding: 1.5rem 1.25rem;
+    min-height: auto;
+  }
+
+  .bioWrapper {
+    margin-top: 30px;
+    gap: 16px;
+  }
+
+  .bioParagraph {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 550px) and (max-width: 768px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
