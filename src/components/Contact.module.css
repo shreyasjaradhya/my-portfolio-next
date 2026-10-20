@@ -1,10 +1,14 @@
 .contactSection {
   padding: 10rem 2rem;
-  background: var(--bg-secondary);
+  background: rgba(13, 13, 18, 0.55);
   border-top: 1px solid var(--border-light);
   text-align: center;
   position: relative;
   overflow: hidden;
+}
+
+:global([data-theme="light"]) .contactSection {
+  background: rgba(255, 255, 255, 0.65);
 }
 
 .contactSection::before {

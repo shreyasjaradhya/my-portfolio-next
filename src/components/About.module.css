@@ -1,8 +1,12 @@
 .aboutSection {
   padding: 8rem 2rem;
-  background: var(--bg-secondary);
+  background: rgba(13, 13, 18, 0.55);
   border-top: 1px solid var(--border-light);
   position: relative;
+}
+
+:global([data-theme="light"]) .aboutSection {
+  background: rgba(255, 255, 255, 0.65);
 }
 
 .container {

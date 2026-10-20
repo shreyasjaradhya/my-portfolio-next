@@ -1,0 +1,422 @@
+.tunnelHeroContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--bg-primary);
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.stickyViewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  background: var(--bg-primary);
+  transition: background-color 0.3s ease;
+}
+
+/* 3D Scene Layer */
+.tunnelScene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Background grid & radial glows */
+.backgroundGrid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border-light) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.65;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, #000 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, #000 50%, transparent 100%);
+  pointer-events: none;
+}
+
+.ambientGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+:global([data-theme="light"]) .ambientGlow {
+  background: radial-gradient(circle at center, rgba(2, 132, 199, 0.1) 0%, transparent 70%);
+}
+
+/* Concentric Depth Tunnel Rings */
+.innerRing {
+  position: absolute;
+  width: 48vmin;
+  height: 48vmin;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  pointer-events: none;
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.05);
+}
+
+:global([data-theme="light"]) .innerRing {
+  border-color: rgba(2, 132, 199, 0.22);
+}
+
+.outerRing {
+  position: absolute;
+  width: 78vmin;
+  height: 78vmin;
+  border-radius: 50%;
+  border: 1px dashed var(--border-light);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Center Content: Typography & Call to Action */
+.centerContent {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 1.5rem;
+  max-width: 680px;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  pointer-events: auto;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-accent);
+  box-shadow: 0 0 8px var(--text-accent);
+  animation: pulseDot 2.4s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
+.mainHeading {
+  font-size: clamp(2.6rem, 5.8vw, 4.8rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  pointer-events: auto;
+}
+
+:global([data-theme="light"]) .mainHeading {
+  background: linear-gradient(180deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.description {
+  font-size: clamp(0.98rem, 1.35vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin-bottom: 2rem;
+  pointer-events: auto;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 60;
+  pointer-events: auto;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 70;
+  pointer-events: auto;
+  user-select: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primaryBtn {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: 1px solid var(--text-primary);
+}
+
+.primaryBtn:hover {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--text-accent);
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.25);
+  transform: translateY(-1px);
+}
+
+.secondaryBtn {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.secondaryBtn:hover {
+  background: var(--bg-glass-hover);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: var(--text-accent);
+  transform: translateY(-1px);
+}
+
+/* Floating 3D Cards Tunnel Layer */
+.cardsTunnel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  z-index: 20;
+}
+
+.tunnelCardWrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 4 / 5;
+  will-change: transform, opacity;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+.tunnelCard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+  display: block;
+  pointer-events: auto;
+}
+
+.tunnelCard:hover {
+  border-color: var(--text-accent);
+  box-shadow: 0 0 26px rgba(56, 189, 248, 0.35);
+}
+
+:global([data-theme="light"]) .tunnelCard {
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+  pointer-events: none;
+}
+
+.tunnelCard:hover .cardImage {
+  transform: scale(1.08);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.25) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.85rem 1rem;
+  pointer-events: none;
+}
+
+.cardCategory {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.cardTitle {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Fallback Card Pattern for Offline/Error states */
+.cardFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(13, 13, 18, 0.95), rgba(30, 41, 59, 0.95));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.circuitGrid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Bottom Scroll Hint */
+.scrollHint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.scrollHint:hover {
+  color: var(--text-accent);
+}
+
+.scrollIndicatorLine {
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(to bottom, var(--text-accent), transparent);
+  animation: scrollDown 2s infinite ease-in-out;
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(-4px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .mainHeading {
+    font-size: clamp(2.3rem, 6vw, 3.6rem);
+  }
+
+  .description {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .centerContent {
+    padding: 0 1rem;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+
+  .mainHeading {
+    font-size: clamp(2rem, 7.5vw, 2.6rem);
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .buttonGroup {
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .scrollHint {
+    bottom: 1rem;
+    font-size: 0.62rem;
+  }
+}

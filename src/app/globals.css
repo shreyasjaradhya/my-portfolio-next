@@ -60,6 +60,11 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+main {
+  position: relative;
+  z-index: 1;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

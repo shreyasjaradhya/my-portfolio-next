@@ -9,6 +9,7 @@ import Achievements from "@/components/Achievements";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ASMRStaticBackground from "@/components/ASMRStaticBackground";
 import { createPublicClient } from "@/lib/supabase/server";
 
 import { 
@@ -50,6 +51,7 @@ export default async function Home() {
 
   return (
     <>
+      <ASMRStaticBackground />
       <Navbar profile={profileRes.data} />
       <main>
         <Hero profile={profileRes.data} />

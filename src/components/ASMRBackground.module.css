@@ -1,0 +1,24 @@
+/*
+ * ASMRBackground.module.css
+ *
+ * Fixed viewport-covering canvas layer.
+ * pointer-events: none so all portfolio content remains interactive.
+ * z-index: 0 keeps it behind content (sections use position: relative).
+ */
+
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
