@@ -9,6 +9,7 @@ import Achievements from "@/components/Achievements";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import ASMRStaticBackground from "@/components/ASMRStaticBackground";
 import { createPublicClient } from "@/lib/supabase/server";
 
@@ -70,6 +71,7 @@ export default async function Home() {
         <Contact profile={profileRes.data} />
       </main>
       <Footer profile={profileRes.data} />
+      <ScrollToTop />
     </>
   );
 }
