@@ -18,35 +18,50 @@ export default async function AdminDashboard() {
     redirect("/admin/login");
   }
 
-  // Fetch all counts securely in parallel
-  const [
-    { count: projectsCount },
-    { count: skillsCount },
-    { count: experiencesCount },
-    { count: educationCount },
-    { count: certificationsCount },
-    { count: achievementsCount },
-    { count: testimonialsCount },
-    { count: totalMessagesCount },
-    { count: unreadMessagesCount },
-    { data: recentMessages }
-  ] = await Promise.all([
-    supabase.from("projects").select("*", { count: 'exact', head: true }),
-    supabase.from("skills").select("*", { count: 'exact', head: true }),
-    supabase.from("experiences").select("*", { count: 'exact', head: true }),
-    supabase.from("education").select("*", { count: 'exact', head: true }),
-    supabase.from("certifications").select("*", { count: 'exact', head: true }),
-    supabase.from("achievements").select("*", { count: 'exact', head: true }),
-    supabase.from("testimonials").select("*", { count: 'exact', head: true }),
-    supabase.from("messages").select("*", { count: 'exact', head: true }),
-    supabase.from("messages").select("*", { count: 'exact', head: true }).eq("status", "unread"),
-    supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(5)
-  ]);
+  // Fetch all counts securely in parallel with crash-resilient fallback
+  let projectsCount: number | null = 0;
+  let skillsCount: number | null = 0;
+  let experiencesCount: number | null = 0;
+  let educationCount: number | null = 0;
+  let certificationsCount: number | null = 0;
+  let achievementsCount: number | null = 0;
+  let testimonialsCount: number | null = 0;
+  let totalMessagesCount: number | null = 0;
+  let unreadMessagesCount: number | null = 0;
+  let recentMessages: Message[] = [];
+
+  try {
+    const results = await Promise.allSettled([
+      supabase.from("projects").select("*", { count: "exact", head: true }),
+      supabase.from("skills").select("*", { count: "exact", head: true }),
+      supabase.from("experiences").select("*", { count: "exact", head: true }),
+      supabase.from("education").select("*", { count: "exact", head: true }),
+      supabase.from("certifications").select("*", { count: "exact", head: true }),
+      supabase.from("achievements").select("*", { count: "exact", head: true }),
+      supabase.from("testimonials").select("*", { count: "exact", head: true }),
+      supabase.from("messages").select("*", { count: "exact", head: true }),
+      supabase.from("messages").select("*", { count: "exact", head: true }).eq("status", "unread"),
+      supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(5)
+    ]);
+
+    if (results[0].status === "fulfilled") projectsCount = results[0].value.count ?? 0;
+    if (results[1].status === "fulfilled") skillsCount = results[1].value.count ?? 0;
+    if (results[2].status === "fulfilled") experiencesCount = results[2].value.count ?? 0;
+    if (results[3].status === "fulfilled") educationCount = results[3].value.count ?? 0;
+    if (results[4].status === "fulfilled") certificationsCount = results[4].value.count ?? 0;
+    if (results[5].status === "fulfilled") achievementsCount = results[5].value.count ?? 0;
+    if (results[6].status === "fulfilled") testimonialsCount = results[6].value.count ?? 0;
+    if (results[7].status === "fulfilled") totalMessagesCount = results[7].value.count ?? 0;
+    if (results[8].status === "fulfilled") unreadMessagesCount = results[8].value.count ?? 0;
+    if (results[9].status === "fulfilled" && results[9].value.data) recentMessages = results[9].value.data as Message[];
+  } catch (err) {
+    console.error("Failed to load dashboard counts:", err);
+  }
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(undefined, { 
-      month: 'short', 
-      day: 'numeric' 
+      month: "short", 
+      day: "numeric" 
     });
   };
 
@@ -73,14 +88,14 @@ export default async function AdminDashboard() {
           <div className={styles.statsGrid}>
             <Link 
               href="/admin/messages" 
-              className={`${styles.statCard} ${hasUnread ? styles.statCardUnread : ''}`}
+              className={`${styles.statCard} ${hasUnread ? styles.statCardUnread : ""}`}
             >
               <div className={styles.statHeader}>
                 <span className={styles.statIcon} aria-hidden="true">✉</span>
                 <span className={styles.statLabel}>Messages</span>
               </div>
               <div className={styles.statValueContainer}>
-                <span className={styles.statValue}>{totalMessagesCount ?? '—'}</span>
+                <span className={styles.statValue}>{totalMessagesCount ?? "—"}</span>
                 {hasUnread && (
                   <span className={styles.statSubtext}>{unreadMessagesCount} unread</span>
                 )}
@@ -92,7 +107,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">⚡</span>
                 <span className={styles.statLabel}>Projects</span>
               </div>
-              <span className={styles.statValue}>{projectsCount ?? '—'}</span>
+              <span className={styles.statValue}>{projectsCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/skills" className={styles.statCard}>
@@ -100,7 +115,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">⚙</span>
                 <span className={styles.statLabel}>Skills</span>
               </div>
-              <span className={styles.statValue}>{skillsCount ?? '—'}</span>
+              <span className={styles.statValue}>{skillsCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/experience" className={styles.statCard}>
@@ -108,7 +123,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">💼</span>
                 <span className={styles.statLabel}>Experience</span>
               </div>
-              <span className={styles.statValue}>{experiencesCount ?? '—'}</span>
+              <span className={styles.statValue}>{experiencesCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/education" className={styles.statCard}>
@@ -116,7 +131,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">🎓</span>
                 <span className={styles.statLabel}>Education</span>
               </div>
-              <span className={styles.statValue}>{educationCount ?? '—'}</span>
+              <span className={styles.statValue}>{educationCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/certifications" className={styles.statCard}>
@@ -124,7 +139,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">📄</span>
                 <span className={styles.statLabel}>Certifications</span>
               </div>
-              <span className={styles.statValue}>{certificationsCount ?? '—'}</span>
+              <span className={styles.statValue}>{certificationsCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/achievements" className={styles.statCard}>
@@ -132,7 +147,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">🏆</span>
                 <span className={styles.statLabel}>Achievements</span>
               </div>
-              <span className={styles.statValue}>{achievementsCount ?? '—'}</span>
+              <span className={styles.statValue}>{achievementsCount ?? "—"}</span>
             </Link>
 
             <Link href="/admin/testimonials" className={styles.statCard}>
@@ -140,7 +155,7 @@ export default async function AdminDashboard() {
                 <span className={styles.statIcon} aria-hidden="true">💬</span>
                 <span className={styles.statLabel}>Testimonials</span>
               </div>
-              <span className={styles.statValue}>{testimonialsCount ?? "-"}</span>
+              <span className={styles.statValue}>{testimonialsCount ?? "—"}</span>
             </Link>
           </div>
 
@@ -180,7 +195,7 @@ export default async function AdminDashboard() {
                       <div className={styles.recentMsgSubject}>
                         {msg.subject || "No subject"}
                       </div>
-                      <span className={`${styles.recentMsgStatus} ${msg.status === 'unread' ? styles.statusUnread : styles.statusRead}`}>
+                      <span className={`${styles.recentMsgStatus} ${msg.status === "unread" ? styles.statusUnread : styles.statusRead}`}>
                         {msg.status}
                       </span>
                     </Link>

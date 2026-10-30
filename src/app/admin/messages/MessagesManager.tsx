@@ -167,7 +167,7 @@ export default function MessagesManager({ initialMessages }: { initialMessages: 
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>Message Details</h2>
-              <button onClick={closeMessage} className={styles.closeBtn}>Ã—</button>
+              <button onClick={closeMessage} className={styles.closeBtn}>×</button>
             </div>
             
             <div className={styles.detailBody}>

@@ -1,4 +1,4 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -37,9 +37,8 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // Successful login, redirect to admin dashboard
-      router.push("/admin");
-      router.refresh(); // Ensure the server re-evaluates the session cookie
+      // Successful login, navigate to admin dashboard with fresh session
+      window.location.href = "/admin";
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during login.");
     } finally {
@@ -81,7 +80,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               disabled={loading}
               autoComplete="current-password"
             />
@@ -104,7 +103,7 @@ export default function AdminLoginPage() {
       </motion.div>
 
       <Link href="/" className={styles.backLink}>
-        â† Return to Public Portfolio
+        &larr; Return to Public Portfolio
       </Link>
     </main>
   );

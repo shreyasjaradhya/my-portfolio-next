@@ -206,7 +206,7 @@ export default function EducationManager({ initialEducation }: { initialEducatio
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingEducation ? "Edit Education" : "Add Education"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
+              <button onClick={closeForm} className={styles.closeBtn}>×</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>

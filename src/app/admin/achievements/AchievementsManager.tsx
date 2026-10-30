@@ -183,7 +183,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
               <button onClick={() => confirmDelete(achievement.id)} className={styles.deleteBtn}>Delete</button>
               {achievement.url && (
                 <a href={achievement.url} target="_blank" rel="noopener noreferrer" className={styles.viewLink}>
-                  View Link â†’
+                  View Link →
                 </a>
               )}
             </div>
@@ -200,7 +200,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingAchievement ? "Edit Achievement" : "Add Achievement"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
+              <button onClick={closeForm} className={styles.closeBtn}>×</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>

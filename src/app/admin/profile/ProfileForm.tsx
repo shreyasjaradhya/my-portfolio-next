@@ -1,4 +1,4 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -82,7 +82,7 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Profil
     if (!formData.title.trim()) return "Title is required.";
     if (!formData.bio.trim()) return "Bio is required.";
     
-    if (formData.email && !/^[^s@]+@[^s@]+.[^s@]+$/.test(formData.email)) {
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       return "Please provide a valid email address.";
     }
     

@@ -1,4 +1,4 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -180,7 +180,7 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h2>{editingSkill ? "Edit Skill" : "Add Skill"}</h2>
-              <button onClick={closeForm} className={styles.closeBtn}>Ã—</button>
+              <button onClick={closeForm} className={styles.closeBtn}>×</button>
             </div>
             
             <form onSubmit={handleSave} className={styles.form}>
@@ -191,7 +191,23 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
                 </div>
                 <div className={styles.inputGroup}>
                   <label htmlFor="category" className={styles.label}>Category *</label>
-                  <input id="category" name="category" type="text" value={formData.category} onChange={handleChange} className={styles.input} disabled={saving} placeholder="e.g. Frontend, Backend" />
+                  <input
+                    id="category"
+                    name="category"
+                    type="text"
+                    list="category-suggestions"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className={styles.input}
+                    disabled={saving}
+                    placeholder="e.g. Hardware & Digital Design"
+                  />
+                  <datalist id="category-suggestions">
+                    <option value="Hardware & Digital Design" />
+                    <option value="Embedded Systems" />
+                    <option value="Tools & Software" />
+                    <option value="Programming" />
+                  </datalist>
                 </div>
               </div>
 

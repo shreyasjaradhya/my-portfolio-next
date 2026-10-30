@@ -14,19 +14,6 @@ export default function Projects({ projects }: { projects: Project[] }) {
   // Show first 3 projects by default as in the reference design, or all when toggled
   const displayedProjects = showAll ? projects : projects.slice(0, 3);
 
-  // Helper for ribbon badge matching reference screenshot (Collection, Completed, In Progress)
-  const getRibbon = (project: Project, idx: number) => {
-    if (project.title.toLowerCase().includes("collection") || project.title.toLowerCase().includes("college")) {
-      return { label: "Collection", className: styles.ribbonCollection };
-    }
-    const badges = [
-      { label: "Collection", className: styles.ribbonCollection },
-      { label: "Completed", className: styles.ribbonCompleted },
-      { label: "In Progress", className: styles.ribbonInProgress },
-    ];
-    return badges[idx % badges.length];
-  };
-
   return (
     <section id="projects" className={styles.projectsSection}>
       <div className={styles.container}>
@@ -45,7 +32,6 @@ export default function Projects({ projects }: { projects: Project[] }) {
         {/* 3-Column Projects Grid */}
         <div className={styles.grid}>
           {displayedProjects.map((project, idx) => {
-            const ribbon = getRibbon(project, idx);
             const isCollection = project.title.toLowerCase().includes("collection") || project.title.toLowerCase().includes("college");
             const leftActionText = isCollection ? "View Collection \u2192" : "Read More \u2192";
             const leftActionHref = project.github_url || project.live_url || "#";
@@ -60,13 +46,6 @@ export default function Projects({ projects }: { projects: Project[] }) {
                 transition={{ duration: 0.5, delay: 0.1 * (idx % 3) }}
                 whileHover={{ y: -6 }}
               >
-                {/* Diagonal Corner Ribbon */}
-                <div className={styles.ribbonContainer}>
-                  <span className={`${styles.ribbon} ${ribbon.className}`}>
-                    {ribbon.label}
-                  </span>
-                </div>
-
                 {/* Top Image Banner with 3-dot options & Title Inside Overlay */}
                 <div className={styles.imageWrapper}>
                   {/* Options three-dot icon */}
