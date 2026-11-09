@@ -1,13 +1,13 @@
 -- Migration: 016_project_images_storage
 -- Description: Create Supabase Storage bucket and RLS policies for project images
 
--- 1. Create the bucket (Public, 5MB limit, JPG/PNG/WEBP)
+-- 1. Create the bucket (Public, 10MB limit, JPG/PNG/WEBP)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
     'project-images',
     'project-images',
     true,
-    5242880, -- 5MB limit
+    10485760, -- 10MB limit
     ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 )
 ON CONFLICT (id) DO UPDATE SET 

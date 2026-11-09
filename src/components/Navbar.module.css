@@ -89,6 +89,42 @@
   transform: translateY(-1px);
 }
 
+.motionBtn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.motionBtn:hover {
+  color: var(--text-accent);
+  border-color: var(--border-glow);
+  background: var(--bg-glass-hover);
+  box-shadow: var(--glow-shadow);
+  transform: translateY(-1px);
+}
+
+.motionBtnActive {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--text-accent);
+  color: var(--text-accent);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+}
+
 .mobileTopBar {
   display: contents;
 }

@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getTestimonials } from "@/lib/supabase/queries";
+import { requireAdminAuth } from "@/lib/supabase/adminAuth";
+import { getAllTestimonialsAdmin } from "@/lib/supabase/queries";
 import TestimonialsManager from "./TestimonialsManager";
 import styles from "./testimonials.module.css";
 
@@ -10,17 +10,11 @@ export const metadata = {
 };
 
 export default async function AdminTestimonialsPage() {
+  await requireAdminAuth();
   const supabase = await createClient();
   
-  // Verify authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/admin/login");
-  }
-
-  // Fetch the existing testimonials data
-  const { data: testimonials, error: fetchError } = await getTestimonials(supabase);
+  // Fetch all testimonials data for moderation (pending, approved, rejected)
+  const { data: testimonials, error: fetchError } = await getAllTestimonialsAdmin(supabase);
 
   if (fetchError) {
     return (

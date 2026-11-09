@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminAuth } from "@/lib/supabase/adminAuth";
 import { getSkills } from "@/lib/supabase/queries";
 import SkillsManager from "./SkillsManager";
 import styles from "./skills.module.css";
@@ -10,15 +10,9 @@ export const metadata = {
 };
 
 export default async function AdminSkillsPage() {
+  await requireAdminAuth();
   const supabase = await createClient();
   
-  // Verify authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/admin/login");
-  }
-
   // Fetch the existing skills data
   const { data: skills, error: skillsError } = await getSkills(supabase);
 
@@ -49,4 +43,3 @@ export default async function AdminSkillsPage() {
     </div>
   );
 }
-

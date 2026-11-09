@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminAuth } from "@/lib/supabase/adminAuth";
 import MessagesManager from "./MessagesManager";
 import styles from "./messages.module.css";
 import type { Message } from "@/lib/supabase/types";
@@ -10,14 +10,8 @@ export const metadata = {
 };
 
 export default async function AdminMessagesPage() {
+  await requireAdminAuth();
   const supabase = await createClient();
-  
-  // Verify authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/admin/login");
-  }
 
   // Fetch the existing messages using the authenticated server client
   const { data: messages, error: fetchError } = await supabase

@@ -49,7 +49,6 @@ export default async function Home() {
     getTestimonials(supabase)
   ]);
 
-
   return (
     <>
       <ASMRStaticBackground />

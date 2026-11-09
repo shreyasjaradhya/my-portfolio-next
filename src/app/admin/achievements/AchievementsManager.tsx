@@ -1,14 +1,20 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Achievement } from "@/lib/supabase/types";
 import styles from "./achievements.module.css";
+import { revalidateHomepage } from "../actions";
 
 export default function AchievementsManager({ initialAchievements }: { initialAchievements: Achievement[] }) {
   const router = useRouter();
+  const [achievements, setAchievements] = useState<Achievement[]>(initialAchievements);
+  useEffect(() => {
+    setAchievements(initialAchievements);
+  }, [initialAchievements]);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
@@ -32,7 +38,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
       description: "",
       date: "",
       url: "",
-      display_order: initialAchievements.length,
+      display_order: achievements.length,
     });
     setError(null);
     setIsFormOpen(true);
@@ -99,23 +105,40 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
       let saveError;
 
       if (editingAchievement) {
+        const optimisticAchievement: Achievement = {
+          ...editingAchievement,
+          ...payload,
+          id: editingAchievement.id,
+        };
+        // 0ms instant UI update
+        setAchievements(prev => prev.map(a => a.id === editingAchievement.id ? optimisticAchievement : a));
+        setIsFormOpen(false);
+
         const { error } = await supabase
           .from("achievements")
           .update(payload)
           .eq("id", editingAchievement.id);
-        saveError = error;
+
+        if (error) {
+          setAchievements(initialAchievements);
+          throw error;
+        }
       } else {
-        const { error } = await supabase
+        const { data: newAch, error } = await supabase
           .from("achievements")
-          .insert([payload]);
-        saveError = error;
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (newAch) {
+          // 0ms instant UI update
+          setAchievements(prev => [...prev, newAch as Achievement]);
+        }
+        setIsFormOpen(false);
       }
 
-      if (saveError) {
-        throw new Error(saveError.message);
-      }
-
-      setIsFormOpen(false);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while saving the achievement.");
@@ -126,24 +149,29 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    setSaving(true);
-    setError(null);
+    const targetId = deletingId;
+    const previous = [...achievements];
+
+    // 0ms instant removal
+    setAchievements(prev => prev.filter(a => a.id !== targetId));
+    setIsDeleteOpen(false);
+    setDeletingId(null);
 
     try {
       const { error } = await supabase
         .from("achievements")
         .delete()
-        .eq("id", deletingId);
+        .eq("id", targetId);
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        setAchievements(previous);
+        throw new Error(error.message);
+      }
 
-      setIsDeleteOpen(false);
-      setDeletingId(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -162,7 +190,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
       </div>
 
       <div className={styles.achievementsGrid}>
-        {initialAchievements.map(achievement => (
+        {achievements.map(achievement => (
           <div key={achievement.id} className={styles.achievementCard}>
             <div className={styles.achievementHeader}>
               <h3 className={styles.achievementTitle}>{achievement.title}</h3>
@@ -189,7 +217,7 @@ export default function AchievementsManager({ initialAchievements }: { initialAc
             </div>
           </div>
         ))}
-        {initialAchievements.length === 0 && (
+        {achievements.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No achievements found. Add your first one!</p>
         )}
       </div>

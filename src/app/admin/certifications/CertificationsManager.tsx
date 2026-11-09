@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Certification } from "@/lib/supabase/types";
@@ -16,6 +16,11 @@ export default function CertificationsManager({ initialCertifications }: { initi
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const [certifications, setCertifications] = useState<Certification[]>(initialCertifications);
+  useEffect(() => {
+    setCertifications(initialCertifications);
+  }, [initialCertifications]);
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -344,53 +349,44 @@ export default function CertificationsManager({ initialCertifications }: { initi
 
   const handleDelete = async () => {
     if (!deletingCert) return;
-    setSaving(true);
-    setError(null);
+    const targetCert = deletingCert;
+    const previous = [...certifications];
+
+    // 0ms instant optimistic removal
+    setCertifications(prev => prev.filter(c => c.id !== targetCert.id));
+    setIsDeleteOpen(false);
+    setDeletingCert(null);
 
     try {
       const { error: dbError } = await supabase
         .from("certifications")
         .delete()
-        .eq("id", deletingCert.id);
+        .eq("id", targetCert.id);
 
-      if (dbError) throw new Error(dbError.message);
+      if (dbError) {
+        setCertifications(previous);
+        throw new Error(dbError.message);
+      }
 
-      // Delete storage files if present
-      if (deletingCert.certificate_url) {
-        const oldPath = extractStoragePath(deletingCert.certificate_url);
+      // Delete storage files in background if present
+      if (targetCert.certificate_url) {
+        const oldPath = extractStoragePath(targetCert.certificate_url);
         if (oldPath) {
-          try {
-            await supabase.storage.from("certificates").remove([oldPath]);
-          } catch (e) {
-            console.warn("Could not delete cert storage file:", e);
-          }
+          supabase.storage.from("certificates").remove([oldPath]).catch(console.warn);
         }
       }
 
-      if (deletingCert.issuer_logo_url) {
-        const oldLogoPath = extractStoragePath(deletingCert.issuer_logo_url);
+      if (targetCert.issuer_logo_url) {
+        const oldLogoPath = extractStoragePath(targetCert.issuer_logo_url);
         if (oldLogoPath) {
-          try {
-            await supabase.storage.from("certificates").remove([oldLogoPath]);
-          } catch (e) {
-            console.warn("Could not delete logo storage file:", e);
-          }
+          supabase.storage.from("certificates").remove([oldLogoPath]).catch(console.warn);
         }
       }
 
-      try {
-        await revalidateHomepage();
-      } catch (revalErr) {
-        console.warn("Revalidation notice:", revalErr);
-      }
-
-      setIsDeleteOpen(false);
-      setDeletingCert(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -443,7 +439,7 @@ export default function CertificationsManager({ initialCertifications }: { initi
       ];
 
       for (const cert of referenceCerts) {
-        const exists = initialCertifications.some(c => c.name.toLowerCase() === cert.name.toLowerCase());
+        const exists = certifications.some(c => c.name.toLowerCase() === cert.name.toLowerCase());
         if (!exists) {
           let { error: insertErr } = await supabase.from("certifications").insert([cert]);
           if (insertErr && (insertErr.message?.toLowerCase().includes("column") || insertErr.message?.toLowerCase().includes("tags"))) {
@@ -460,12 +456,7 @@ export default function CertificationsManager({ initialCertifications }: { initi
         }
       }
 
-      try {
-        await revalidateHomepage();
-      } catch (e) {
-        console.warn("Revalidation warning:", e);
-      }
-
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Failed to import reference certificates.");
@@ -479,7 +470,7 @@ export default function CertificationsManager({ initialCertifications }: { initi
       <div className={styles.actionHeader}>
         <h2 className={styles.sectionTitle}>Certificates & Achievements</h2>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          {initialCertifications.length < 3 && (
+          {certifications.length < 3 && (
             <button
               type="button"
               onClick={handleImportReferenceCerts}
@@ -496,7 +487,7 @@ export default function CertificationsManager({ initialCertifications }: { initi
       </div>
 
       <div className={styles.certificationsGrid}>
-        {initialCertifications.map(cert => (
+        {certifications.map(cert => (
           <div key={cert.id} className={styles.certificationCard}>
             {cert.issuer_logo_url && (
               <div className={styles.adminCardLogo}>
@@ -548,7 +539,7 @@ export default function CertificationsManager({ initialCertifications }: { initi
             </div>
           </div>
         ))}
-        {initialCertifications.length === 0 && (
+        {certifications.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No certificates found. Add your first one!</p>
         )}
       </div>

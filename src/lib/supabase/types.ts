@@ -102,14 +102,22 @@ export interface Message {
   created_at: string;
 }
 
+export type TestimonialStatus = 'pending' | 'approved' | 'rejected';
+
 export interface Testimonial {
   id: string;
+  user_id?: string | null;
   name: string;
+  email?: string | null;
   role: string | null;
   company: string | null;
   content: string;
   rating: number | null;
   avatar_url: string | null;
+  linkedin_url?: string | null;
+  website_url?: string | null;
+  status?: TestimonialStatus;
   display_order: number;
   created_at: string;
+  updated_at?: string;
 }

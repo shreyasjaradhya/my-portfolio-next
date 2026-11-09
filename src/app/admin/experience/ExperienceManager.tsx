@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Experience } from "@/lib/supabase/types";
@@ -14,6 +14,11 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp
 export default function ExperienceManager({ initialExperiences }: { initialExperiences: Experience[] }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences);
+  useEffect(() => {
+    setExperiences(initialExperiences);
+  }, [initialExperiences]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -48,7 +53,7 @@ export default function ExperienceManager({ initialExperiences }: { initialExper
       description: "",
       technologies: "",
       image_url: "",
-      display_order: initialExperiences.length,
+      display_order: experiences.length,
     });
     setSelectedImageFile(null);
     setImagePreview(null);
@@ -240,50 +245,62 @@ export default function ExperienceManager({ initialExperiences }: { initialExper
         updated_at: new Date().toISOString()
       };
 
-      let saveError;
-
       if (editingExperience) {
-        const { error } = await supabase
+        const optimisticExp: Experience = {
+          ...editingExperience,
+          ...payload,
+          id: editingExperience.id,
+        };
+        // 0ms instant UI update
+        setExperiences(prev => prev.map(e => e.id === editingExperience.id ? optimisticExp : e));
+        setIsFormOpen(false);
+
+        let { error } = await supabase
           .from("experiences")
           .update(payload)
           .eq("id", editingExperience.id);
-        saveError = error;
-      } else {
-        const { error } = await supabase
-          .from("experiences")
-          .insert([payload]);
-        saveError = error;
-      }
 
-      // If database complains image_url column doesn't exist yet, retry without image_url
-      if (saveError && saveError.message?.toLowerCase().includes("image_url")) {
-        delete payload.image_url;
-        if (editingExperience) {
+        if (error && error.message?.toLowerCase().includes("image_url")) {
+          delete payload.image_url;
           const { error: retryErr } = await supabase
             .from("experiences")
             .update(payload)
             .eq("id", editingExperience.id);
-          saveError = retryErr;
-        } else {
-          const { error: retryErr } = await supabase
-            .from("experiences")
-            .insert([payload]);
-          saveError = retryErr;
+          error = retryErr;
         }
+
+        if (error) {
+          setExperiences(initialExperiences);
+          throw error;
+        }
+      } else {
+        let { data: newExp, error } = await supabase
+          .from("experiences")
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error && error.message?.toLowerCase().includes("image_url")) {
+          delete payload.image_url;
+          const { data: retryExp, error: retryErr } = await supabase
+            .from("experiences")
+            .insert([payload])
+            .select()
+            .single();
+          error = retryErr;
+          newExp = retryExp;
+        }
+
+        if (error) throw error;
+        if (newExp) {
+          // 0ms instant UI update
+          setExperiences(prev => [newExp as Experience, ...prev]);
+        }
+        setIsFormOpen(false);
       }
 
-      if (saveError) {
-        throw new Error(saveError.message);
-      }
-
-      // Revalidate public homepage cache
-      try {
-        await revalidateHomepage();
-      } catch (revalErr) {
-        console.warn("Cache revalidation notice:", revalErr);
-      }
-
-      setIsFormOpen(false);
+      // Revalidate cache in background without blocking UI
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while saving the experience.");
@@ -294,44 +311,38 @@ export default function ExperienceManager({ initialExperiences }: { initialExper
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    setSaving(true);
-    setError(null);
+    const targetId = deletingId;
+    const expToDelete = experiences.find(e => e.id === targetId);
+    const previousExperiences = [...experiences];
+
+    // 0ms instant UI removal: modal closes and item vanishes immediately!
+    setExperiences(prev => prev.filter(e => e.id !== targetId));
+    setIsDeleteOpen(false);
+    setDeletingId(null);
 
     try {
-      const expToDelete = initialExperiences.find(e => e.id === deletingId);
-
       const { error } = await supabase
         .from("experiences")
         .delete()
-        .eq("id", deletingId);
+        .eq("id", targetId);
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        setExperiences(previousExperiences);
+        throw new Error(error.message);
+      }
 
-      // Clean up storage image if exists
+      // Clean up storage image in background
       if (expToDelete?.image_url) {
         const oldPath = extractStoragePath(expToDelete.image_url);
         if (oldPath) {
-          try {
-            await supabase.storage.from("experience-images").remove([oldPath]);
-          } catch (e) {
-            console.warn("Could not remove deleted experience image:", e);
-          }
+          supabase.storage.from("experience-images").remove([oldPath]).catch(console.warn);
         }
       }
 
-      try {
-        await revalidateHomepage();
-      } catch (revalErr) {
-        console.warn("Cache revalidation notice:", revalErr);
-      }
-
-      setIsDeleteOpen(false);
-      setDeletingId(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -350,7 +361,7 @@ export default function ExperienceManager({ initialExperiences }: { initialExper
       </div>
 
       <div className={styles.experiencesGrid}>
-        {initialExperiences.map(exp => (
+        {experiences.map(exp => (
           <div key={exp.id} className={styles.experienceCard}>
             {exp.image_url ? (
               <div className={styles.adminCardImage}>
@@ -397,7 +408,7 @@ export default function ExperienceManager({ initialExperiences }: { initialExper
             </div>
           </div>
         ))}
-        {initialExperiences.length === 0 && (
+        {experiences.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No experiences found. Create your first one!</p>
         )}
       </div>

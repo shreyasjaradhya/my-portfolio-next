@@ -1,14 +1,20 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Education } from "@/lib/supabase/types";
 import styles from "./education.module.css";
+import { revalidateHomepage } from "../actions";
 
 export default function EducationManager({ initialEducation }: { initialEducation: Education[] }) {
   const router = useRouter();
+  const [educationList, setEducationList] = useState<Education[]>(initialEducation);
+  useEffect(() => {
+    setEducationList(initialEducation);
+  }, [initialEducation]);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
@@ -36,7 +42,7 @@ export default function EducationManager({ initialEducation }: { initialEducatio
       start_date: "",
       end_date: "",
       description: "",
-      display_order: initialEducation.length,
+      display_order: educationList.length,
     });
     setError(null);
     setIsFormOpen(true);
@@ -106,23 +112,40 @@ export default function EducationManager({ initialEducation }: { initialEducatio
       let saveError;
 
       if (editingEducation) {
+        const optimisticEdu: Education = {
+          ...editingEducation,
+          ...payload,
+          id: editingEducation.id,
+        };
+        // 0ms instant UI update
+        setEducationList(prev => prev.map(e => e.id === editingEducation.id ? optimisticEdu : e));
+        setIsFormOpen(false);
+
         const { error } = await supabase
           .from("education")
           .update(payload)
           .eq("id", editingEducation.id);
-        saveError = error;
+
+        if (error) {
+          setEducationList(initialEducation);
+          throw error;
+        }
       } else {
-        const { error } = await supabase
+        const { data: newEdu, error } = await supabase
           .from("education")
-          .insert([payload]);
-        saveError = error;
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (newEdu) {
+          // 0ms instant UI update
+          setEducationList(prev => [...prev, newEdu as Education]);
+        }
+        setIsFormOpen(false);
       }
 
-      if (saveError) {
-        throw new Error(saveError.message);
-      }
-
-      setIsFormOpen(false);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while saving the education record.");
@@ -133,24 +156,29 @@ export default function EducationManager({ initialEducation }: { initialEducatio
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    setSaving(true);
-    setError(null);
+    const targetId = deletingId;
+    const previousEdu = [...educationList];
+
+    // 0ms instant removal
+    setEducationList(prev => prev.filter(e => e.id !== targetId));
+    setIsDeleteOpen(false);
+    setDeletingId(null);
 
     try {
       const { error } = await supabase
         .from("education")
         .delete()
-        .eq("id", deletingId);
+        .eq("id", targetId);
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        setEducationList(previousEdu);
+        throw new Error(error.message);
+      }
 
-      setIsDeleteOpen(false);
-      setDeletingId(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -169,7 +197,7 @@ export default function EducationManager({ initialEducation }: { initialEducatio
       </div>
 
       <div className={styles.educationGrid}>
-        {initialEducation.map(edu => (
+        {educationList.map(edu => (
           <div key={edu.id} className={styles.educationCard}>
             <div className={styles.educationHeader}>
               <h3 className={styles.educationInstitution}>{edu.institution}</h3>
@@ -195,7 +223,7 @@ export default function EducationManager({ initialEducation }: { initialEducatio
             </div>
           </div>
         ))}
-        {initialEducation.length === 0 && (
+        {educationList.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No education records found. Add your first one!</p>
         )}
       </div>

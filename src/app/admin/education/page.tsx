@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminAuth } from "@/lib/supabase/adminAuth";
 import { getEducation } from "@/lib/supabase/queries";
 import EducationManager from "./EducationManager";
 import styles from "./education.module.css";
@@ -10,15 +10,9 @@ export const metadata = {
 };
 
 export default async function AdminEducationPage() {
+  await requireAdminAuth();
   const supabase = await createClient();
   
-  // Verify authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/admin/login");
-  }
-
   // Fetch the existing education data
   const { data: education, error: eduError } = await getEducation(supabase);
 
@@ -49,4 +43,3 @@ export default async function AdminEducationPage() {
     </div>
   );
 }
-

@@ -71,21 +71,23 @@ export default function Testimonials({
   testimonials: DbTestimonial[];
   autoplay?: boolean;
 }) {
-  // Map Supabase database records to component format
+  // Map Supabase database records to component format (only approved testimonials)
   const mappedTestimonials: CircularItem[] = useMemo(() => {
     if (!testimonials || testimonials.length === 0) return [];
-    return testimonials.map((t) => {
-      const parts = [t.role, t.company].filter(Boolean);
-      const designation = parts.join(" • ") || t.role || t.company || "Collaborator";
-      return {
-        id: t.id,
-        name: t.name,
-        designation,
-        quote: t.content,
-        src: t.avatar_url || generateAvatarDataUri(t.name),
-        rating: t.rating,
-      };
-    });
+    return testimonials
+      .filter((t) => t.status === "approved" || !t.status)
+      .map((t) => {
+        const parts = [t.role, t.company].filter(Boolean);
+        const designation = parts.join(" • ") || t.role || t.company || "Collaborator";
+        return {
+          id: t.id,
+          name: t.name,
+          designation,
+          quote: t.content,
+          src: t.avatar_url || generateAvatarDataUri(t.name),
+          rating: t.rating,
+        };
+      });
   }, [testimonials]);
 
   const displayLength = mappedTestimonials.length;

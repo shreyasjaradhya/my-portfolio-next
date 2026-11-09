@@ -1,19 +1,24 @@
 /* eslint-disable */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Project } from "@/lib/supabase/types";
 import styles from "./projects.module.css";
 import { revalidateHomepage } from "../actions";
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function ProjectsManager({ initialProjects }: { initialProjects: Project[] }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  useEffect(() => {
+    setProjects(initialProjects);
+  }, [initialProjects]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -114,7 +119,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      setError("Image size exceeds 5 MB limit. Please select a smaller photo.");
+      setError("Image size exceeds 10 MB limit. Please select a smaller photo.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -250,36 +255,49 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       let saveError;
 
       if (editingProject) {
+        const optimisticProject: Project = {
+          ...editingProject,
+          ...payload,
+          id: editingProject.id,
+        };
+        // 0ms instant UI update
+        setProjects(prev => prev.map(p => p.id === editingProject.id ? optimisticProject : p));
+        setIsFormOpen(false);
+
         const { error } = await supabase
           .from("projects")
           .update(payload)
           .eq("id", editingProject.id);
-        saveError = error;
-      } else {
-        const { error } = await supabase
-          .from("projects")
-          .insert([payload]);
-        saveError = error;
-      }
-
-      if (saveError) {
-        if (saveError.code === "23505") { // unique violation
-          throw new Error("A project with this slug already exists. Slugs must be unique.");
+        
+        if (error) {
+          // Rollback on error
+          setProjects(initialProjects);
+          throw error;
         }
-        throw new Error(saveError.message);
+      } else {
+        const { data: newProj, error } = await supabase
+          .from("projects")
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (newProj) {
+          // 0ms instant UI update
+          setProjects(prev => [newProj as Project, ...prev]);
+        }
+        setIsFormOpen(false);
       }
 
-      // 3. Revalidate cache and update UI
-      try {
-        await revalidateHomepage();
-      } catch (revalErr) {
-        console.warn("Revalidate homepage warning:", revalErr);
-      }
-
-      setIsFormOpen(false);
+      // Revalidate cache in background without blocking UI
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "An error occurred while saving the project.");
+      if (err.code === "23505") {
+        setError("A project with this slug already exists. Slugs must be unique.");
+      } else {
+        setError(err.message || "An error occurred while saving the project.");
+      }
     } finally {
       setSaving(false);
     }
@@ -287,44 +305,39 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    setSaving(true);
-    setError(null);
+    const targetId = deletingId;
+    const projectToDelete = projects.find(p => p.id === targetId);
+    const previousProjects = [...projects];
+
+    // 0ms instant UI removal: modal closes and item vanishes immediately!
+    setProjects(prev => prev.filter(p => p.id !== targetId));
+    setIsDeleteOpen(false);
+    setDeletingId(null);
 
     try {
-      const projectToDelete = initialProjects.find(p => p.id === deletingId);
-
       const { error } = await supabase
         .from("projects")
         .delete()
-        .eq("id", deletingId);
+        .eq("id", targetId);
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        // Rollback on failure
+        setProjects(previousProjects);
+        throw new Error(error.message);
+      }
 
-      // Clean up storage image if exists
+      // Clean up storage image if exists in background
       if (projectToDelete?.image_url) {
         const oldPath = extractStoragePath(projectToDelete.image_url);
         if (oldPath) {
-          try {
-            await supabase.storage.from("project-images").remove([oldPath]);
-          } catch (e) {
-            console.warn("Could not remove deleted project image:", e);
-          }
+          supabase.storage.from("project-images").remove([oldPath]).catch(console.warn);
         }
       }
 
-      try {
-        await revalidateHomepage();
-      } catch (revalErr) {
-        console.warn("Revalidate homepage warning:", revalErr);
-      }
-
-      setIsDeleteOpen(false);
-      setDeletingId(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -338,7 +351,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       </div>
 
       <div className={styles.projectsGrid}>
-        {initialProjects.map(project => (
+        {projects.map(project => (
           <div key={project.id} className={styles.projectCard}>
             {project.image_url ? (
               <div className={styles.adminCardImage}>
@@ -371,7 +384,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
             </div>
           </div>
         ))}
-        {initialProjects.length === 0 && (
+        {projects.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No projects found. Create your first one!</p>
         )}
       </div>
@@ -437,7 +450,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
                       Click to select a project image from your computer
                     </span>
                     <span className={styles.uploadSubtext}>
-                      JPG, JPEG, PNG, or WEBP up to 5 MB (16:9 recommended)
+                      JPG, JPEG, PNG, or WEBP up to 10 MB (16:9 recommended)
                     </span>
                   </div>
                 )}
@@ -453,7 +466,7 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
                 />
                 
                 <div className={styles.helperText}>
-                  Supported formats: JPG, JPEG, PNG, WEBP (Max: 5MB). Image is displayed in 16:9 aspect ratio.
+                  Supported formats: JPG, JPEG, PNG, WEBP (Max: 10MB). Image is displayed in 16:9 aspect ratio.
                 </div>
               </div>
 

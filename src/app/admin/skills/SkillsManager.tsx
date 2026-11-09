@@ -1,14 +1,20 @@
 /* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Skill } from "@/lib/supabase/types";
 import styles from "./skills.module.css";
+import { revalidateHomepage } from "../actions";
 
 export default function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
   const router = useRouter();
+  const [skills, setSkills] = useState<Skill[]>(initialSkills);
+  useEffect(() => {
+    setSkills(initialSkills);
+  }, [initialSkills]);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
@@ -30,7 +36,7 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
       category: "",
       name: "",
       level: "",
-      display_order: initialSkills.length,
+      display_order: skills.length,
     });
     setError(null);
     setIsFormOpen(true);
@@ -93,23 +99,40 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
       let saveError;
 
       if (editingSkill) {
+        const optimisticSkill: Skill = {
+          ...editingSkill,
+          ...payload,
+          id: editingSkill.id,
+        };
+        // 0ms instant UI update
+        setSkills(prev => prev.map(s => s.id === editingSkill.id ? optimisticSkill : s));
+        setIsFormOpen(false);
+
         const { error } = await supabase
           .from("skills")
           .update(payload)
           .eq("id", editingSkill.id);
-        saveError = error;
+
+        if (error) {
+          setSkills(initialSkills);
+          throw error;
+        }
       } else {
-        const { error } = await supabase
+        const { data: newSkill, error } = await supabase
           .from("skills")
-          .insert([payload]);
-        saveError = error;
+          .insert([payload])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (newSkill) {
+          // 0ms instant UI update
+          setSkills(prev => [...prev, newSkill as Skill]);
+        }
+        setIsFormOpen(false);
       }
 
-      if (saveError) {
-        throw new Error(saveError.message);
-      }
-
-      setIsFormOpen(false);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while saving the skill.");
@@ -120,24 +143,29 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    setSaving(true);
-    setError(null);
+    const targetId = deletingId;
+    const previousSkills = [...skills];
+
+    // 0ms instant removal
+    setSkills(prev => prev.filter(s => s.id !== targetId));
+    setIsDeleteOpen(false);
+    setDeletingId(null);
 
     try {
       const { error } = await supabase
         .from("skills")
         .delete()
-        .eq("id", deletingId);
+        .eq("id", targetId);
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        setSkills(previousSkills);
+        throw new Error(error.message);
+      }
 
-      setIsDeleteOpen(false);
-      setDeletingId(null);
+      revalidateHomepage().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "An error occurred while deleting.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -151,7 +179,7 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
       </div>
 
       <div className={styles.skillsGrid}>
-        {initialSkills.map(skill => (
+        {skills.map(skill => (
           <div key={skill.id} className={styles.skillCard}>
             <div className={styles.skillHeader}>
               <h3 className={styles.skillName}>{skill.name}</h3>
@@ -169,7 +197,7 @@ export default function SkillsManager({ initialSkills }: { initialSkills: Skill[
             </div>
           </div>
         ))}
-        {initialSkills.length === 0 && (
+        {skills.length === 0 && (
           <p style={{ color: 'var(--text-secondary)' }}>No skills found. Add your first skill!</p>
         )}
       </div>

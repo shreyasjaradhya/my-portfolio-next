@@ -8,6 +8,7 @@ import LiquidNavbar, {
   LiquidNavItem,
   NimbusIcons,
 } from "./LiquidNavbar";
+import SwarmRebuild from "./SwarmRebuild";
 import type { Profile } from "@/lib/supabase/types";
 
 const SECTION_IDS = [
@@ -22,6 +23,7 @@ const SECTION_IDS = [
 export default function Navbar({ profile }: { profile: Profile | null }) {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [isSwarmOpen, setIsSwarmOpen] = useState(false);
   const isNavigatingRef = useRef(false);
 
   // Sync theme with the portfolio's data-theme attribute
@@ -113,6 +115,19 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
           </div>
 
           <div className={styles.actionsBox}>
+            <button
+              type="button"
+              onClick={() => setIsSwarmOpen((prev) => !prev)}
+              className={`${styles.motionBtn} ${isSwarmOpen ? styles.motionBtnActive : ""}`}
+              title="Trigger Portfolio Motions Animation"
+              aria-label="Toggle Portfolio Motions Animation"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <span>Motion</span>
+            </button>
+
             {profile?.resume_url && (
               <a
                 href={profile.resume_url}
@@ -137,6 +152,13 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
           />
         </div>
       </div>
+
+      {/* Standalone Swarm Rebuild Motion Overlay */}
+      <SwarmRebuild
+        isOpen={isSwarmOpen}
+        onClose={() => setIsSwarmOpen(false)}
+        enableSound={true}
+      />
     </header>
   );
 }

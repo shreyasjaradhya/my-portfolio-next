@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminAuth } from "@/lib/supabase/adminAuth";
 import { getExperiences } from "@/lib/supabase/queries";
 import ExperienceManager from "./ExperienceManager";
 import styles from "./experience.module.css";
@@ -10,15 +10,9 @@ export const metadata = {
 };
 
 export default async function AdminExperiencePage() {
+  await requireAdminAuth();
   const supabase = await createClient();
   
-  // Verify authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    redirect("/admin/login");
-  }
-
   // Fetch the existing experience data
   const { data: experiences, error: expError } = await getExperiences(supabase);
 
@@ -49,4 +43,3 @@ export default async function AdminExperiencePage() {
     </div>
   );
 }
-

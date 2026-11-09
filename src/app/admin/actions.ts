@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { invalidateDashboardCache } from "./dashboardData";
 
 export async function revalidateHomepage() {
   const supabase = await createClient();
@@ -13,6 +14,15 @@ export async function revalidateHomepage() {
     throw new Error("Unauthorized: Only authenticated admins can trigger cache invalidation.");
   }
 
+  // Invalidate in-memory dashboard cache so counts stay fresh
+  invalidateDashboardCache();
+
   // Revalidate the root homepage
   revalidatePath("/", "page");
+  revalidatePath("/admin", "page");
+}
+
+export async function invalidateDashboard() {
+  invalidateDashboardCache();
+  revalidatePath("/admin", "page");
 }

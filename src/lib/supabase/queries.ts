@@ -1,4 +1,4 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { 
   Profile, 
@@ -82,8 +82,29 @@ export async function getAchievements(supabase: SupabaseClient) {
 }
 
 export async function getTestimonials(supabase: SupabaseClient) {
+  // Query approved testimonials for public display
+  const { data, error } = await supabase
+    .from('testimonials')
+    .select('*')
+    .eq('status', 'approved')
+    .order('display_order', { ascending: true });
+
+  if (error) {
+    // If column status does not exist yet in database, fallback to all
+    if (error.code === '42703' || error.message?.includes('status')) {
+      return fetchFromTable<Testimonial>(
+        supabase.from('testimonials').select('*').order('display_order', { ascending: true })
+      );
+    }
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function getAllTestimonialsAdmin(supabase: SupabaseClient) {
   return fetchFromTable<Testimonial>(
-    supabase.from('testimonials').select('*').order('display_order', { ascending: true })
+    supabase.from('testimonials').select('*').order('created_at', { ascending: false })
   );
 }
 

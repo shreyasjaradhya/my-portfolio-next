@@ -1,17 +1,23 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import type { Message } from "@/lib/supabase/types";
 import styles from "./messages.module.css";
+import { invalidateDashboard } from "../actions";
 
 type FilterStatus = 'all' | 'unread' | 'read' | 'archived';
 
 export default function MessagesManager({ initialMessages }: { initialMessages: Message[] }) {
   const router = useRouter();
   
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
+
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -19,7 +25,7 @@ export default function MessagesManager({ initialMessages }: { initialMessages: 
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filteredMessages = initialMessages.filter(msg => {
+  const filteredMessages = messages.filter(msg => {
     if (filter === 'all') return true;
     return msg.status === filter;
   });
@@ -39,47 +45,56 @@ export default function MessagesManager({ initialMessages }: { initialMessages: 
 
   const handleStatusChange = async (newStatus: string) => {
     if (!selectedMessage) return;
-    setUpdating(true);
-    setError(null);
+    const msgId = selectedMessage.id;
+    const previousMessages = [...messages];
+
+    // 0ms instant local update
+    setSelectedMessage(prev => prev ? { ...prev, status: newStatus } : null);
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, status: newStatus } : m));
 
     try {
       const { error: updateError } = await supabase
         .from('messages')
         .update({ status: newStatus })
-        .eq('id', selectedMessage.id);
+        .eq('id', msgId);
 
-      if (updateError) throw new Error(updateError.message);
+      if (updateError) {
+        setMessages(previousMessages);
+        throw new Error(updateError.message);
+      }
 
-      setSelectedMessage({ ...selectedMessage, status: newStatus });
+      invalidateDashboard().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'An error occurred while updating status.');
-    } finally {
-      setUpdating(false);
     }
   };
 
   const handleDelete = async () => {
     if (!selectedMessage) return;
-    setUpdating(true);
-    setError(null);
+    const msgId = selectedMessage.id;
+    const previousMessages = [...messages];
+
+    // 0ms instant local removal
+    setMessages(prev => prev.filter(m => m.id !== msgId));
+    setIsDeleteOpen(false);
+    setSelectedMessage(null);
 
     try {
       const { error: deleteError } = await supabase
         .from('messages')
         .delete()
-        .eq('id', selectedMessage.id);
+        .eq('id', msgId);
 
-      if (deleteError) throw new Error(deleteError.message);
+      if (deleteError) {
+        setMessages(previousMessages);
+        throw new Error(deleteError.message);
+      }
 
-      setIsDeleteOpen(false);
-      setSelectedMessage(null);
+      invalidateDashboard().catch(console.warn);
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'An error occurred while deleting.');
-      setIsDeleteOpen(false); // Close delete modal to show error on detail modal
-    } finally {
-      setUpdating(false);
     }
   };
 
