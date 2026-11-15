@@ -582,6 +582,17 @@ export default function SwarmRebuild({
 
     const w = typeof window !== "undefined" ? window.innerWidth : 1200;
     const h = typeof window !== "undefined" ? window.innerHeight : 800;
+    const isMobile = w < 768;
+    const isSmallMobile = w < 480;
+
+    // Helper for safe responsive X coordinates (desktop unchanged, mobile clamped & scaled)
+    const getRespX = (desktopOffset: number, minMargin = isMobile ? 16 : 36): number => {
+      if (!isMobile) return w / 2 + desktopOffset;
+      const maxOffset = (w / 2) - minMargin - (isSmallMobile ? 32 : 46);
+      const scale = Math.min(1, Math.max(0.18, (w - 60) / 900));
+      const clamped = Math.max(-maxOffset, Math.min(maxOffset, desktopOffset * scale));
+      return w / 2 + clamped;
+    };
 
     // Spawn Exactly 8 Cursors outside viewport in circle with physical velocity vectors
     setCursors((prev) =>
@@ -597,8 +608,8 @@ export default function SwarmRebuild({
           vx: -Math.cos(angle) * 6,
           vy: -Math.sin(angle) * 6,
           tilt: 0,
-          targetX: w / 2 + Math.cos(angle) * 220,
-          targetY: 180 + Math.sin(angle) * 120,
+          targetX: w / 2 + Math.cos(angle) * (isMobile ? 120 : 220),
+          targetY: 180 + Math.sin(angle) * (isMobile ? 70 : 120),
           clicking: false,
           currentTask: "Connecting peer session...",
           trail: [],
@@ -606,20 +617,20 @@ export default function SwarmRebuild({
       })
     );
 
-    // Initialize 8 brains with sector-based spatial mapping and wrist-arc parameters
+    // Initialize 8 brains with sector-based spatial mapping (2x4 on mobile, 4x2 on desktop) and wrist-arc parameters
     agentBrainsRef.current = Array.from({ length: 8 }).map((_, i) => ({
-      targetX: w / 2 + (i - 3.5) * 110,
+      targetX: w / 2 + (i - 3.5) * (isMobile ? 35 : 110),
       targetY: 200,
-      startX: w / 2 + (i - 3.5) * 110,
+      startX: w / 2 + (i - 3.5) * (isMobile ? 35 : 110),
       startY: 200,
       moveStartTime: 0,
       moveDuration: 1.6,
-      arcHeight: (i % 2 === 0 ? 1 : -1) * (20 + (i % 3) * 15),
+      arcHeight: (i % 2 === 0 ? 1 : -1) * (isMobile ? 12 : 20 + (i % 3) * 15),
       nextPickTime: 0.4 + i * 0.22,
       currentTask: "Entering canvas...",
       tooltip: "Motion Engine",
-      sectorCol: i % 4,
-      sectorRow: Math.floor(i / 4),
+      sectorCol: isMobile ? (i % 2) : (i % 4),
+      sectorRow: isMobile ? Math.floor(i / 2) : Math.floor(i / 4),
     }));
 
     startTimeRef.current = performance.now();
@@ -635,10 +646,12 @@ export default function SwarmRebuild({
     const fullSubtitle = "VLSI & Embedded Systems Specialist";
     const fullBioSnippet = "Electronics & Communication Engineering student at NMAM Institute of Technology with a strong passion for VLSI design, FPGA development, and embedded computing systems.";
 
-    const cardWidth = Math.min(340, Math.max(260, (w - 140) / 3));
-    const cardGap = 24;
-    const cardsTotalWidth = cardWidth * 3 + cardGap * 2;
-    const cardsStartX = Math.max(30, (w - cardsTotalWidth) / 2);
+    const cardWidth = isMobile
+      ? Math.max(260, w - 48)
+      : Math.min(340, Math.max(260, (w - 140) / 3));
+    const cardGap = isMobile ? 16 : 24;
+    const cardsTotalWidth = isMobile ? cardWidth : cardWidth * 3 + cardGap * 2;
+    const cardsStartX = isMobile ? (w - cardWidth) / 2 : Math.max(30, (w - cardsTotalWidth) / 2);
 
     const animate = (currentTime: number) => {
       const rawElapsed = (currentTime - startTimeRef.current) / 1000;
@@ -830,8 +843,8 @@ export default function SwarmRebuild({
         }
         const cloneP = (elapsed - 8.4) / 0.8;
         setGhostCard({
-          x: cardsStartX + (cardWidth + cardGap) * cloneP,
-          y: 1240,
+          x: isMobile ? cardsStartX : cardsStartX + (cardWidth + cardGap) * cloneP,
+          y: isMobile ? 1240 + (260 + cardGap) * cloneP : 1240,
           title: "FPGA Real-time Signal Accelerator",
           active: true,
         });
@@ -842,8 +855,8 @@ export default function SwarmRebuild({
         }
         const cloneP = (elapsed - 9.2) / 0.8;
         setGhostCard({
-          x: cardsStartX + (cardWidth + cardGap) + (cardWidth + cardGap) * cloneP,
-          y: 1240,
+          x: isMobile ? cardsStartX : cardsStartX + (cardWidth + cardGap) + (cardWidth + cardGap) * cloneP,
+          y: isMobile ? 1240 + (260 + cardGap) + (260 + cardGap) * cloneP : 1240,
           title: "Smart Embedded Hardware Controller",
           active: true,
         });
@@ -855,10 +868,10 @@ export default function SwarmRebuild({
       if (elapsed > 9.6 && elapsed < 10.4) {
         const marqueeP = Math.min(1, (elapsed - 9.6) / 0.7);
         setMarquee({
-          x: cardsStartX - 14,
+          x: cardsStartX - (isMobile ? 8 : 14),
           y: 1210,
-          w: (cardsTotalWidth + 28) * marqueeP,
-          h: 380,
+          w: isMobile ? (cardWidth + 16) : (cardsTotalWidth + 28) * marqueeP,
+          h: isMobile ? 560 * marqueeP : 380,
         });
       } else {
         setMarquee(null);
@@ -869,11 +882,11 @@ export default function SwarmRebuild({
         setRulers([
           {
             id: "ruler-gap",
-            x1: cardsStartX + cardWidth,
-            y1: 1360,
-            x2: cardsStartX + cardWidth + cardGap,
-            y2: 1360,
-            label: "↔ 24px Auto-Layout Gap",
+            x1: isMobile ? cardsStartX + cardWidth / 2 : cardsStartX + cardWidth,
+            y1: isMobile ? 1460 : 1360,
+            x2: isMobile ? cardsStartX + cardWidth / 2 : cardsStartX + cardWidth + cardGap,
+            y2: isMobile ? 1460 + cardGap : 1360,
+            label: isMobile ? "↕ 16px Stack Gap" : "↔ 24px Auto-Layout Gap",
             color: "#f43f5e",
           },
         ]);
@@ -895,8 +908,8 @@ export default function SwarmRebuild({
 
       // Procedural Random Wandering Waypoint Generator for 8 Cursors (Sector & Arc Guided)
       const brains = agentBrainsRef.current;
-      const minCanvasX = Math.max(70, (w - 1180) / 2);
-      const maxCanvasX = Math.min(w - 70, (w + 1180) / 2);
+      const minCanvasX = isMobile ? 16 : Math.max(70, (w - 1180) / 2);
+      const maxCanvasX = isMobile ? (w - 16) : Math.min(w - 70, (w + 1180) / 2);
       const canvasWidth = maxCanvasX - minCanvasX;
       const sectionHeight = Math.max(380, activeMaxY - activeMinY);
 
@@ -911,26 +924,30 @@ export default function SwarmRebuild({
           brain.startY = brain.targetY;
 
           // Natural wrist arc height (gentle curve perpendicular to trajectory)
-          brain.arcHeight = (idx % 2 === 0 ? 1 : -1) * (24 + Math.random() * 26);
+          const baseArc = isMobile ? 12 + Math.random() * 14 : 24 + Math.random() * 26;
+          brain.arcHeight = (idx % 2 === 0 ? 1 : -1) * baseArc;
 
-          // Sector boundaries (4 columns, 2 rows = 8 designated quadrants)
-          const colWidth = canvasWidth / 4;
-          const rowHeight = sectionHeight / 2;
-          const colMin = minCanvasX + brain.sectorCol * colWidth + 24;
-          const colMax = colMin + colWidth - 48;
-          const rowMin = activeMinY + brain.sectorRow * rowHeight + 20;
-          const rowMax = rowMin + rowHeight - 40;
+          // Sector boundaries (Mobile: 2 columns x 4 rows; Desktop: 4 columns x 2 rows)
+          const numCols = isMobile ? 2 : 4;
+          const numRows = isMobile ? 4 : 2;
+          const colWidth = canvasWidth / numCols;
+          const rowHeight = sectionHeight / numRows;
+          const colMargin = isSmallMobile ? 10 : isMobile ? 16 : 24;
+          const colMin = minCanvasX + brain.sectorCol * colWidth + colMargin;
+          const colMax = colMin + colWidth - colMargin * 2;
+          const rowMin = activeMinY + brain.sectorRow * rowHeight + (isMobile ? 12 : 20);
+          const rowMax = rowMin + rowHeight - (isMobile ? 24 : 40);
 
           // Pick target within assigned ergonomic sector with smooth random coordinates
-          const randX = colMin + Math.random() * Math.max(20, colMax - colMin);
-          const randY = rowMin + Math.random() * Math.max(20, rowMax - rowMin);
+          const randX = colMin + Math.random() * Math.max(16, colMax - colMin);
+          const randY = rowMin + Math.random() * Math.max(16, rowMax - rowMin);
 
           brain.targetX = randX;
           brain.targetY = randY;
 
-          // With 25% probability, shift sector column for organic cross-canvas roaming
+          // Shift sector column periodically for organic cross-canvas roaming
           if (Math.random() < 0.25) {
-            brain.sectorCol = (brain.sectorCol + (Math.random() > 0.5 ? 1 : 3)) % 4;
+            brain.sectorCol = (brain.sectorCol + 1) % numCols;
           }
         }
       });
@@ -948,25 +965,26 @@ export default function SwarmRebuild({
           if (elapsed < 2.8) {
             // 1. Hero Section
             if (i === 1) {
-              const cursorTypeX = (w / 2 - 200) + (typedTitle.length * 20.5);
-              tx = Math.min(w - 70, cursorTypeX);
-              ty = 210;
+              const titleScale = isMobile ? 12.5 : 20.5;
+              const cursorTypeX = (w / 2 - (isMobile ? 110 : 200)) + (typedTitle.length * titleScale);
+              tx = Math.max(isMobile ? 24 : 60, Math.min(w - (isMobile ? 70 : 100), cursorTypeX));
+              ty = isMobile ? 225 : 210;
               clicking = true;
               task = `Typing: "${typedTitle.slice(-8) || "Heading"}"`;
               tooltip = "font-family: Anton";
             } else if (i === 0) {
-              tx = w / 2 - 260 + Math.sin(elapsed * 2) * 40;
+              tx = isMobile ? getRespX(-120) : w / 2 - 260 + Math.sin(elapsed * 2) * 40;
               ty = 48;
               task = "Mounting LiquidNavbar droplets...";
               tooltip = "Auto-Layout [9999px]";
             } else if (i === 2) {
-              tx = w / 2 + 320 + Math.sin(elapsed * 2) * 15;
+              tx = isMobile ? getRespX(120) : w / 2 + 320 + Math.sin(elapsed * 2) * 15;
               ty = 48;
               task = "Snapping Resume pill...";
               tooltip = "Constraints: Right";
             } else if (i === 3) {
               tx = w / 2;
-              ty = 130 + Math.cos(elapsed * 3) * 6;
+              ty = (isMobile ? 140 : 130) + Math.cos(elapsed * 3) * 6;
               task = "Locking Available For Work pill...";
               tooltip = "● Available • NMAMIT";
               clicking = elapsed > 1.8 && elapsed < 2.2;
@@ -983,27 +1001,29 @@ export default function SwarmRebuild({
           } else if (elapsed < 5.4) {
             // 2. About Section
             if (i === 3) {
-              const lineChar = typedBio.length % 55;
-              const lineRow = Math.floor(typedBio.length / 55);
-              tx = Math.min(w - 100, (w / 2 - 320) + lineChar * 11);
-              ty = 680 + lineRow * 18;
+              const charsPerLine = isMobile ? 32 : 55;
+              const lineChar = typedBio.length % charsPerLine;
+              const lineRow = Math.floor(typedBio.length / charsPerLine);
+              const startX = isMobile ? (w / 2 - 120) : (w / 2 - 320);
+              tx = Math.max(16, Math.min(w - (isMobile ? 60 : 100), startX + lineChar * (isMobile ? 7.5 : 11)));
+              ty = (isMobile ? 740 : 680) + lineRow * 18;
               task = "Typing verified biography...";
               tooltip = "Terminal Stream";
               clicking = true;
             } else if (i === 0) {
-              tx = w / 2 - 340 + Math.sin(elapsed * 2) * 20;
-              ty = 530;
+              tx = isMobile ? w / 2 : getRespX(-340) + Math.sin(elapsed * 2) * 20;
+              ty = isMobile ? 510 : 530;
               task = "Styling Hardware & VLSI card...";
               tooltip = "Academic & Projects";
               clicking = true;
             } else if (i === 1) {
-              tx = w / 2 + Math.cos(elapsed * 2) * 20;
-              ty = 530;
+              tx = isMobile ? w / 2 : w / 2 + Math.cos(elapsed * 2) * 20;
+              ty = isMobile ? 580 : 530;
               task = "Styling B.Tech Degree card...";
               tooltip = "NMAM Institute of Technology";
             } else if (i === 2) {
-              tx = w / 2 + 340 + Math.sin(elapsed * 2) * 20;
-              ty = 530;
+              tx = isMobile ? w / 2 : getRespX(340) + Math.sin(elapsed * 2) * 20;
+              ty = isMobile ? 650 : 530;
               task = "Styling 5+ Projects card...";
               tooltip = "Hardware & Software";
               clicking = true;
@@ -1019,25 +1039,25 @@ export default function SwarmRebuild({
           } else if (elapsed < 7.8) {
             // 3. Skills Matrix
             if (i === 0) {
-              tx = w / 2 - 280 + Math.sin(elapsed * 2.5) * 40;
-              ty = 890;
+              tx = isMobile ? w / 2 : getRespX(-280) + Math.sin(elapsed * 2.5) * 40;
+              ty = isMobile ? 890 : 890;
               task = "Placing Hardware & VLSI badges...";
               tooltip = "Verilog • SystemVerilog";
               clicking = true;
             } else if (i === 1) {
-              tx = w / 2 + 280 + Math.cos(elapsed * 2.5) * 40;
-              ty = 890;
+              tx = isMobile ? w / 2 : getRespX(280) + Math.cos(elapsed * 2.5) * 40;
+              ty = isMobile ? 965 : 890;
               task = "Placing Embedded Systems badges...";
               tooltip = "Microcontrollers • PCB";
             } else if (i === 2) {
-              tx = w / 2 - 280 + Math.cos(elapsed * 2.5) * 40;
-              ty = 1040;
+              tx = isMobile ? w / 2 : getRespX(-280) + Math.cos(elapsed * 2.5) * 40;
+              ty = isMobile ? 1040 : 1040;
               task = "Placing EDA & CAD software...";
               tooltip = "Xilinx Vivado • KiCad";
               clicking = true;
             } else if (i === 3) {
-              tx = w / 2 + 280 + Math.sin(elapsed * 2.5) * 40;
-              ty = 1040;
+              tx = isMobile ? w / 2 : getRespX(280) + Math.sin(elapsed * 2.5) * 40;
+              ty = isMobile ? 1115 : 1040;
               task = "Placing Programming Languages...";
               tooltip = "C • Python • Java";
             } else {
@@ -1052,26 +1072,28 @@ export default function SwarmRebuild({
           } else if (elapsed < 10.4) {
             // 4. Featured Projects
             if (i === 0) {
-              tx = cardsStartX + cardWidth / 2 + Math.sin(elapsed * 2) * 20;
-              ty = 1380;
+              tx = isMobile ? w / 2 : cardsStartX + cardWidth / 2 + Math.sin(elapsed * 2) * 20;
+              ty = isMobile ? 1320 : 1380;
               task = "Mounting RISC-V 32-bit CPU Card...";
               tooltip = "RV32I Single-Cycle Verilog";
               clicking = true;
             } else if (i === 1) {
-              tx = cardsStartX + cardWidth + cardGap + cardWidth / 2 + Math.cos(elapsed * 2) * 20;
-              ty = 1380;
+              tx = isMobile ? w / 2 : cardsStartX + cardWidth + cardGap + cardWidth / 2 + Math.cos(elapsed * 2) * 20;
+              ty = isMobile ? 1460 : 1380;
               task = "Mounting FPGA Accel Card...";
               tooltip = "Xilinx Vivado Signal DSP";
               clicking = true;
             } else if (i === 2) {
-              tx = ghostCard ? ghostCard.x + 80 : cardsStartX + cardWidth + cardGap + cardWidth / 2;
-              ty = ghostCard ? ghostCard.y + 40 : 1380;
+              tx = ghostCard
+                ? (isMobile ? w / 2 : ghostCard.x + 80)
+                : (isMobile ? w / 2 : cardsStartX + cardWidth + cardGap + cardWidth / 2);
+              ty = ghostCard ? ghostCard.y + 40 : (isMobile ? 1530 : 1380);
               task = ghostCard ? "Alt+Drag Option Duplicating..." : "Auto-Layout Card Clone";
               tooltip = "Option-Drag Clone";
               clicking = !!ghostCard;
             } else if (i === 3) {
-              tx = cardsStartX + (cardWidth + cardGap) * 2 + cardWidth / 2 + Math.sin(elapsed * 2) * 20;
-              ty = 1380;
+              tx = isMobile ? w / 2 : cardsStartX + (cardWidth + cardGap) * 2 + cardWidth / 2 + Math.sin(elapsed * 2) * 20;
+              ty = isMobile ? 1600 : 1380;
               task = "Mounting Smart Controller Card...";
               tooltip = "Embedded C & FreeRTOS";
               clicking = true;
@@ -1087,25 +1109,25 @@ export default function SwarmRebuild({
           } else if (elapsed < 12.8) {
             // 5. Experience Timeline
             if (i === 0) {
-              tx = w / 2 - 260 - 80 + Math.sin(elapsed * 2.5) * 15;
-              ty = 1710;
+              tx = isMobile ? getRespX(-50) : w / 2 - 260 - 80 + Math.sin(elapsed * 2.5) * 15;
+              ty = isMobile ? 1720 : 1710;
               task = "Pinning Collection diagonal ribbon...";
               tooltip = "VLSI & Hardware Engineering";
               clicking = true;
             } else if (i === 1) {
-              tx = w / 2 + 260 - 80 + Math.cos(elapsed * 2.5) * 15;
-              ty = 1710;
+              tx = isMobile ? getRespX(50) : w / 2 + 260 - 80 + Math.cos(elapsed * 2.5) * 15;
+              ty = isMobile ? 1830 : 1710;
               task = "Pinning Collection diagonal ribbon...";
               tooltip = "NMAM Institute of Technology";
               clicking = true;
             } else if (i === 2) {
-              tx = w / 2 - 260 + 40;
-              ty = 1770 + Math.sin(elapsed * 2) * 12;
+              tx = isMobile ? getRespX(-40) : w / 2 - 260 + 40;
+              ty = isMobile ? 1750 : 1770 + Math.sin(elapsed * 2) * 12;
               task = "Aligning Academic milestone...";
               tooltip = "Role: VLSI Research";
             } else if (i === 3) {
-              tx = w / 2 + 260 + 40;
-              ty = 1770 + Math.cos(elapsed * 2) * 12;
+              tx = isMobile ? getRespX(40) : w / 2 + 260 + 40;
+              ty = isMobile ? 1860 : 1770 + Math.cos(elapsed * 2) * 12;
               task = "Aligning B.Tech ECE milestone...";
               tooltip = "Institution: NMAMIT";
             } else {
@@ -1120,36 +1142,36 @@ export default function SwarmRebuild({
           } else if (elapsed < 15.2) {
             // 6. Certifications & National Credentials
             if (i === 0) {
-              tx = w / 2 - 320;
-              ty = 2120;
+              tx = isMobile ? getRespX(-50) : w / 2 - 320;
+              ty = isMobile ? 2080 : 2120;
               task = "Validating MY Bharat Budget Quest 2026...";
               tooltip = "National PM Dialogue • Shortlisted";
               clicking = true;
             } else if (i === 1) {
-              tx = w / 2;
-              ty = 2120;
+              tx = isMobile ? getRespX(50) : w / 2;
+              ty = isMobile ? 2140 : 2120;
               task = "Validating IEEE AIDE 2026 Presentation...";
               tooltip = "International Conference Paper";
               clicking = true;
             } else if (i === 2) {
-              tx = w / 2 + 320;
-              ty = 2120;
+              tx = isMobile ? getRespX(-50) : w / 2 + 320;
+              ty = isMobile ? 2200 : 2120;
               task = "Mounting AIC Nitte Internship Credential...";
               tooltip = "Atal Incubation Centre Nitte";
               clicking = true;
             } else if (i === 3) {
-              tx = w / 2 - 320;
-              ty = 2190;
+              tx = isMobile ? getRespX(50) : w / 2 - 320;
+              ty = isMobile ? 2100 : 2190;
               task = "Auditing Ministry of Youth Affairs emblem...";
               tooltip = "Emblem SVG: Verified";
             } else if (i === 4) {
-              tx = w / 2;
-              ty = 2190;
+              tx = isMobile ? getRespX(-50) : w / 2;
+              ty = isMobile ? 2160 : 2190;
               task = "Hashing IEEE conference certificate ID...";
               tooltip = "SHA-256 Verified";
             } else if (i === 5) {
-              tx = w / 2 + 320;
-              ty = 2190;
+              tx = isMobile ? getRespX(50) : w / 2 + 320;
+              ty = isMobile ? 2220 : 2190;
               task = "Testing credential outbound link...";
               tooltip = "View Experience →";
               clicking = (elapsed > 14.4 && elapsed < 14.8);
@@ -1160,26 +1182,26 @@ export default function SwarmRebuild({
           } else if (elapsed < 17.6) {
             // 7. Achievements & Testimonials
             if (i === 0) {
-              tx = w / 2 - 280;
-              ty = 2480;
+              tx = isMobile ? getRespX(-40) : w / 2 - 280;
+              ty = isMobile ? 2470 : 2480;
               task = "Tracing National PM Dialogue achievement...";
               tooltip = "Rank: Top 0.1% National";
               clicking = true;
             } else if (i === 1) {
-              tx = w / 2 - 280;
-              ty = 2560;
+              tx = isMobile ? getRespX(40) : w / 2 - 280;
+              ty = isMobile ? 2530 : 2560;
               task = "Tracing IEEE International Conference node...";
               tooltip = "Publication Verified";
               clicking = true;
             } else if (i === 2) {
-              tx = w / 2 + 220;
-              ty = 2480;
+              tx = isMobile ? getRespX(-40) : w / 2 + 220;
+              ty = isMobile ? 2600 : 2480;
               task = "Mounting Verified 5-Star Testimonial...";
               tooltip = "Rating: ★★★★★ 5.0";
               clicking = true;
             } else if (i === 3) {
-              tx = w / 2 + 220;
-              ty = 2580;
+              tx = isMobile ? getRespX(40) : w / 2 + 220;
+              ty = isMobile ? 2660 : 2580;
               task = "Styling peer recommendation avatar...";
               tooltip = "Circular Avatar Droplet";
             } else {
@@ -1194,24 +1216,24 @@ export default function SwarmRebuild({
           } else if (elapsed < 19.8) {
             // 8. Contact Console & Direct Dispatch
             if (i === 0) {
-              tx = w / 2 - 220;
-              ty = 2880;
+              tx = isMobile ? w / 2 : w / 2 - 220;
+              ty = isMobile ? 2850 : 2880;
               task = "Wiring email: shreyasjaradhya@gmail.com...";
               tooltip = "mailto: dispatch";
               clicking = (elapsed > 18.2 && elapsed < 18.6);
             } else if (i === 1) {
-              tx = w / 2;
-              ty = 2880;
+              tx = isMobile ? w / 2 : w / 2;
+              ty = isMobile ? 2895 : 2880;
               task = "Testing LinkedIn profile endpoint...";
               tooltip = "LinkedIn ↗";
             } else if (i === 2) {
-              tx = w / 2 + 220;
-              ty = 2880;
+              tx = isMobile ? w / 2 : w / 2 + 220;
+              ty = isMobile ? 2940 : 2880;
               task = "Testing GitHub repositories endpoint...";
               tooltip = "GitHub ↗";
             } else if (i === 3) {
               tx = w / 2;
-              ty = 2950;
+              ty = isMobile ? 2990 : 2950;
               task = "Locking copyright banner...";
               tooltip = "© 2026 J Shreyas Aradhya";
               clicking = true;
@@ -1227,8 +1249,10 @@ export default function SwarmRebuild({
           } else if (elapsed < 21.4) {
             // 9. Grand Assembly Celebration Swirl: 8 cursors in an evenly spaced orbital ellipse
             const swirlAngle = (elapsed * 2.5) + (i * Math.PI * 2) / 8;
-            tx = w / 2 + Math.cos(swirlAngle) * 220;
-            ty = 220 + Math.sin(swirlAngle) * 100;
+            const radiusX = isSmallMobile ? 90 : isMobile ? 130 : 220;
+            const radiusY = isSmallMobile ? 55 : isMobile ? 70 : 100;
+            tx = w / 2 + Math.cos(swirlAngle) * radiusX;
+            ty = (isMobile ? 200 : 220) + Math.sin(swirlAngle) * radiusY;
             task = "✓ Complete 9 Modules Verified & Ready!";
             tooltip = "100% DOM Restored";
           } else {
@@ -1262,26 +1286,28 @@ export default function SwarmRebuild({
           };
         });
 
-        // Step 2: SOFT VELOCITY-BASED ANTI-COLLISION & ANTI-OVERLAP
-        // Smooth continuous potential field guarantees ZERO collision, zero overlap, and zero jitter!
+        // Step 2: SOFT VELOCITY-BASED ANTI-COLLISION & ANTI-OVERLAP (Elliptical Mobile-Aware)
+        // Scaled continuous potential field guarantees ZERO collision, zero overlap, and zero jitter!
         const repForces = Array.from({ length: updated.length }, () => ({ x: 0, y: 0 }));
-        const REPULSION_RADIUS = 160; // 160px guaranteed clearance
+        const REPULSION_RADIUS_X = isSmallMobile ? 68 : isMobile ? 86 : 160;
+        const REPULSION_RADIUS_Y = isSmallMobile ? 30 : isMobile ? 40 : 75;
 
         for (let i = 0; i < updated.length; i++) {
           for (let j = i + 1; j < updated.length; j++) {
             const dx = prev[i].x - prev[j].x;
             const dy = prev[i].y - prev[j].y;
-            const dist = Math.hypot(dx, dy);
-            if (dist < REPULSION_RADIUS && dist > 1) {
-              const ratio = (REPULSION_RADIUS - dist) / REPULSION_RADIUS;
+            const normDist = Math.hypot(dx / REPULSION_RADIUS_X, dy / REPULSION_RADIUS_Y);
+            if (normDist < 1.0 && normDist > 0.01) {
+              const ratio = 1.0 - normDist;
               // Smooth quadratic repulsion force (zero shock, purely continuous)
-              const force = Math.pow(ratio, 2) * 3.2;
-              const nx = dx / dist;
-              const ny = dy / dist;
-              repForces[i].x += nx * force;
-              repForces[i].y += ny * force;
-              repForces[j].x -= nx * force;
-              repForces[j].y -= ny * force;
+              const forceMag = Math.pow(ratio, 2) * (isMobile ? 2.2 : 3.2);
+              const angle = Math.atan2(dy / REPULSION_RADIUS_Y, dx / REPULSION_RADIUS_X);
+              const fx = Math.cos(angle) * forceMag * (REPULSION_RADIUS_X / 40);
+              const fy = Math.sin(angle) * forceMag * (REPULSION_RADIUS_Y / 40);
+              repForces[i].x += fx;
+              repForces[i].y += fy;
+              repForces[j].x -= fx;
+              repForces[j].y -= fy;
             }
           }
         }
@@ -1305,7 +1331,10 @@ export default function SwarmRebuild({
             vy = (vy / speed) * MAX_SPEED;
           }
 
-          const nextX = c.x + vx;
+          // Safe screen boundary clamping prevents name tags from clipping off-screen
+          const minSafeX = isMobile ? 8 : 20;
+          const maxSafeX = w - (isSmallMobile ? 74 : isMobile ? 86 : 150);
+          const nextX = Math.max(minSafeX, Math.min(maxSafeX, c.x + vx));
           const nextY = c.y + vy;
 
           // Dynamic banking tilt in motion direction (-14deg to +14deg)
