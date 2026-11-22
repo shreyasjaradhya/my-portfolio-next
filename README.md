@@ -1,156 +1,145 @@
 <div align="center">
 
-  <!-- Terminal Typing Header Banner -->
+  <!-- Circuit-Inspired Header Banner -->
+  <img src="./header.svg" alt="Shreyas Aradhya — Electronics & Communication Engineering | Hardware • FPGA • VLSI • Embedded Systems" width="100%" />
+
+  <br><br>
+
+  <!-- Dynamic Typing Subtitle -->
   <a href="https://github.com/shreyasjaradhya">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=2800&pause=1000&color=22C55E&background=00000000&center=true&vCenter=true&width=750&lines=%3E_Building+Silicon-Grade+Hardware%2C+FPGA+Cores+%26+Embedded+Systems;%3E_VLSI+Design+%7C+Verilog+%26+SystemVerilog+RTL;%3E_From+Gate-Level+Synthesis+to+Intelligent+Edge+Computing..." alt="Typing SVG Banner" />
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=15&duration=2600&pause=1000&color=38BDF8&background=00000000&center=true&vCenter=true&width=620&lines=%3E_Electronics+%26+Communication+Engineering;%3E_Digital+Logic+%26+RTL+Design+with+Verilog;%3E_FPGA+Development+%26+Embedded+Hardware+Systems..." alt="Typing Subtitle" />
   </a>
 
-  <h1>Hi, I'm J Shreyas Aradhya! ⚡</h1>
-
-  <p>
-    🎓 <strong>B.Tech in Electronics & Communication Engineering at NMAMIT, Nitte</strong><br>
-    📟 <strong>VLSI Design</strong> &nbsp;|&nbsp; 🔬 <strong>FPGA & Digital Logic</strong> &nbsp;|&nbsp; 🔌 <strong>Embedded Systems & Firmware</strong>
-  </p>
-
-  <!-- Profile Action Buttons / Badges -->
-  <p>
-    <a href="https://github.com/shreyasjaradhya/my-portfolio-next">
-      <img src="https://img.shields.io/badge/PORTFOLIO-LIVE_APP-0d1117?style=for-the-badge&logo=vercel&logoColor=38bdf8&labelColor=0d1117" alt="Portfolio" />
-    </a>
-    &nbsp;
-    <a href="https://linkedin.com">
-      <img src="https://img.shields.io/badge/LINKEDIN-SHREYAS_ARADHYA-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=0a66c2" alt="LinkedIn" />
-    </a>
-    &nbsp;
-    <a href="https://github.com/shreyasjaradhya">
-      <img src="https://img.shields.io/badge/GITHUB-shreyasjaradhya-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=161b22" alt="GitHub" />
-    </a>
-    &nbsp;
-    <a href="mailto:shreyasjaradhya@gmail.com">
-      <img src="https://img.shields.io/badge/EMAIL-shreyasjaradhya@gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white&labelColor=c5221f" alt="Email" />
-    </a>
-  </p>
-
 </div>
 
 ---
 
-### 📌 About Me
+### About Me
 
-* 🎓 **Undergraduate**: 3rd Year B.Tech student in **Electronics & Communication Engineering (ECE)** at **NMAM Institute of Technology (NMAMIT), Nitte**.
-* 🔬 **Core Specialization**: Architecting high-reliability digital circuits, Verilog/SystemVerilog RTL modeling, FPGA synthesis & timing verification (Xilinx Vivado), PCB schematic capture & layout (KiCad), and bare-metal embedded firmware.
-* 🏆 **Competitions & National Honors**:
-  * **MY Bharat Budget Quest 2026**: Shortlisted out of **over 12 Lakh participants nationwide** for the prestigious **Final Round National Virtual Dialogue with the Hon'ble Prime Minister of India**.
-  * **IEEE AIDE 2026 International Conference**: Presented research paper on machine learning for predictive modeling and adaptive systems.
-  * **AIC Nitte Technical Residency**: Completed hands-on engineering internship at Atal Incubation Centre Nitte, working on embedded hardware telemetry and tech innovation pipelines.
-* 🛡 **Hardware Engineering Philosophy**: Cycle-accurate deterministic logic, race-condition immunity, minimal critical path propagation delay, and robust hardware-software co-design.
-* ⚡ **Engineering Mindset**: Prioritizing clean RTL architecture, thorough testbench verification, and silicon-grade performance over bloated abstractions.
+I am an **Electronics & Communication Engineering** student with a focused interest in **VLSI design**, **FPGA development**, and **embedded hardware systems**.
+
+My technical interests revolve around digital system design, RTL modeling, and hardware-oriented programming. I enjoy translating engineering concepts into practical, reliable implementations through continuous learning, simulation, and hardware experimentation.
+
+* 🎓 Undergraduate student in **Electronics & Communication Engineering**.
+* 🔬 Focused on **digital logic design**, **computer architecture**, and **silicon systems**.
+* 🔌 Experienced in combining **firmware programming** with **physical circuit design**.
+* ⚙️ Dedicated to writing clean, synthesizable code and building practical hardware solutions.
 
 ---
 
-### 📂 Featured Production Projects
+### Currently Exploring
 
-#### **RISC-V 32-bit CPU Core (RV32I)** — Single-Cycle Verilog Microprocessor
+* 📟 **FPGA Development** — Synthesizing digital circuits and testing logic implementations on hardware.
+* 📝 **RTL Design with Verilog** — Writing modular, synthesizable RTL modules and self-checking testbenches.
+* 🏛 **Digital Architecture** — Exploring processor datapath organization, arithmetic units, and control logic.
+* 🔌 **Embedded Hardware** — Developing microcontroller interfaces with real-time sensors and actuators.
+* 🔄 **Hardware-Software Integration** — Bridging low-level firmware with underlying digital hardware.
+* 🔬 **VLSI Design Fundamentals** — Understanding CMOS gate characteristics, timing constraints, and propagation delays.
+
+---
+
+### Technical Skills
+
+#### Languages
 <p>
-  <img src="https://img.shields.io/badge/STATUS-VERIFIED_RTL-22c55e?style=flat-square" alt="Status" />
-  <img src="https://img.shields.io/badge/ARCH-RV32I_ISA-38bdf8?style=flat-square" alt="Arch" />
-  <img src="https://img.shields.io/badge/TOOLCHAIN-MODELSIM_%2F_VERILOG-a855f7?style=flat-square" alt="Toolchain" />
-  <img src="https://img.shields.io/badge/PIPELINE-SINGLE--CYCLE-f59e0b?style=flat-square" alt="Pipeline" />
+  <img src="https://img.shields.io/badge/C-00599C?style=flat-square&logo=c&logoColor=white" alt="C" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Verilog_HDL-0F172A?style=flat-square&logo=microchip&logoColor=38bdf8" alt="Verilog HDL" />
 </p>
 
-Custom 32-bit RISC-V (RV32I) microprocessor core engineered from bare metal in Verilog HDL. Implements full integer instruction set execution including Arithmetic Logic Unit (ALU), register file addressing, conditional branching logic, program counter management, and Harvard architecture memory bus interface. Thoroughly verified with self-checking testbenches and GTKWave waveform timing analysis.
-
-* ⚡ **Tech Stack**: `Verilog HDL`, `ModelSim`, `GTKWave`, `RISC-V ISA`, `Digital Logic Synthesis`, `RTL Verification`
-* 🔗 [View GitHub Repository](https://github.com/shreyasjaradhya) &bull; [Technical Architecture Report](https://github.com/shreyasjaradhya) &bull; [Waveform Timing Analysis](https://github.com/shreyasjaradhya)
-
----
-
-#### **FPGA Real-Time Signal Accelerator** — Hardware DSP Processing Engine
+#### Tools & EDA Suites
 <p>
-  <img src="https://img.shields.io/badge/STATUS-HARDWARE_SYNTHESIZED-22c55e?style=flat-square" alt="Status" />
-  <img src="https://img.shields.io/badge/TARGET-XILINX_ARTIX--7-ec4899?style=flat-square" alt="Target" />
-  <img src="https://img.shields.io/badge/TOOLCHAIN-VIVADO_HLx-38bdf8?style=flat-square" alt="Toolchain" />
-  <img src="https://img.shields.io/badge/DOMAIN-DIGITAL_DSP-eab308?style=flat-square" alt="Domain" />
+  <img src="https://img.shields.io/badge/Xilinx_Vivado-000000?style=flat-square&logo=amd&logoColor=white" alt="Xilinx Vivado" />
+  <img src="https://img.shields.io/badge/MATLAB-0076A8?style=flat-square&logo=mathworks&logoColor=white" alt="MATLAB" />
+  <img src="https://img.shields.io/badge/KiCad-314CB0?style=flat-square&logo=kicad&logoColor=white" alt="KiCad" />
+  <img src="https://img.shields.io/badge/LTspice-1E293B?style=flat-square&logo=circuitverse&logoColor=38bdf8" alt="LTspice" />
 </p>
 
-High-throughput real-time digital signal processing hardware pipeline deployed on FPGA silicon. Engineered with pipelined Multiply-Accumulate (MAC) units, hardware-timed FIR/IIR filtering stages, and synchronous register transfers for ultra-low latency signal transformation. Synthesized and place-and-routed on Xilinx Artix-7 with verified setup/hold timing closure.
-
-* ⚡ **Tech Stack**: `Xilinx Vivado`, `Verilog HDL`, `Artix-7 FPGA`, `Digital Signal Processing (DSP)`, `MATLAB`, `RTL Timing Closure`
-* 🔗 [View GitHub Repository](https://github.com/shreyasjaradhya) &bull; [FPGA Synthesis Report](https://github.com/shreyasjaradhya) &bull; [MATLAB Co-Simulation](https://github.com/shreyasjaradhya)
-
----
-
-#### **Reactor Temperature Control System** — Predictive & Adaptive RL Platform
+#### Technical Areas
 <p>
-  <img src="https://img.shields.io/badge/STATUS-RESEARCH_BENCHMARK-22c55e?style=flat-square" alt="Status" />
-  <img src="https://img.shields.io/badge/DOMAIN-CONTROL_SYSTEMS_%26_ML-818cf8?style=flat-square" alt="Domain" />
-  <img src="https://img.shields.io/badge/SIMULATION-MATLAB_%26_PYTHON-06b6d4?style=flat-square" alt="Simulation" />
-  <img src="https://img.shields.io/badge/CONFERENCE-IEEE_AIDE_2026-f43f5e?style=flat-square" alt="Conference" />
+  <img src="https://img.shields.io/badge/FPGA-Logic_Synthesis-0F172A?style=flat-square" alt="FPGA" />
+  <img src="https://img.shields.io/badge/Digital_Electronics-Circuit_Design-0F172A?style=flat-square" alt="Digital Electronics" />
+  <img src="https://img.shields.io/badge/PCB_Design-Schematic_%26_Layout-0F172A?style=flat-square" alt="PCB Design" />
+  <img src="https://img.shields.io/badge/Embedded_Systems-Firmware-0F172A?style=flat-square" alt="Embedded Systems" />
+  <img src="https://img.shields.io/badge/Microcontrollers-Hardware_Interfacing-0F172A?style=flat-square" alt="Microcontrollers" />
 </p>
 
-Industrial closed-loop reactor temperature control platform developed to handle steep non-linear thermodynamic transients. Integrates state-space dynamic modelling, predictive Kalman state estimation, and adaptive reinforcement learning weights to maintain tight temperature bounds without thermal runaway or overshoot.
+---
 
-* ⚡ **Tech Stack**: `Python`, `MATLAB / Simulink`, `Reinforcement Learning`, `State-Space Dynamics`, `Control Systems Engineering`
-* 🔗 [View GitHub Repository](https://github.com/shreyasjaradhya) &bull; [IEEE Conference Presentation](https://github.com/shreyasjaradhya) &bull; [Dynamic Simulation Notebook](https://github.com/shreyasjaradhya)
+### Featured Projects
+
+#### 1. Reactor Temperature Control System
+> Predictive/control algorithms and hardware implementation exploration.
+
+* **Domain**: Control Systems & Predictive Algorithms
+* **Overview**: Implemented predictive and control algorithms to manage closed-loop temperature dynamics in a simulated batch reactor environment. Focused on system stability, parameter tuning, and hardware execution feasibility.
+* **Tools & Technologies**: Python, MATLAB, Control Systems Theory
+* **Status**: *Academic & Research Exploration*
+
+#### 2. Digital Timer
+> Digital logic and synchronous timer design.
+
+* **Domain**: Digital Design & FPGA
+* **Overview**: Designed a digital timing system using sequential logic, clock division networks, and synchronous counter architectures. Explored timing constraints and 7-segment display multiplexing.
+* **Tools & Technologies**: Verilog HDL, Digital Electronics, FPGA Design
+* **Status**: *Hardware Synthesis & Simulation*
+
+#### 3. Traffic Light Controller
+> Finite State Machine (FSM) based sequential digital design.
+
+* **Domain**: Digital Systems & State Machine Design
+* **Overview**: Modeled and verified an automated traffic junction controller based on a deterministic Finite State Machine (FSM). Features state transition logic, interval delay counters, and safety fault states.
+* **Tools & Technologies**: Verilog HDL, FSM Modeling, ModelSim
+* **Status**: *RTL Verification & Simulation*
+
+#### 4. Arduino Hospital Robot
+> Embedded robotic system integrating environmental sensors and motor control.
+
+* **Domain**: Embedded Systems & Robotics
+* **Overview**: Engineered an autonomous robotic prototype designed for indoor hospital assistance. Integrated ultrasonic distance sensing for collision avoidance, temperature/humidity monitoring arrays, and PWM motor actuation.
+* **Tools & Technologies**: Embedded C, Arduino, Sensors, Motor Drivers
+* **Status**: *Functional Hardware Prototype*
 
 ---
 
-#### **Smart Embedded Hospital Telemetry Robot** — Autonomous Hardware Assistant
-<p>
-  <img src="https://img.shields.io/badge/STATUS-PROTOTYPE_COMPLETE-22c55e?style=flat-square" alt="Status" />
-  <img src="https://img.shields.io/badge/HARDWARE-ARDUINO_%26_AVR-f97316?style=flat-square" alt="Hardware" />
-  <img src="https://img.shields.io/badge/PCB-KICAD_DESIGN-38bdf8?style=flat-square" alt="PCB" />
-  <img src="https://img.shields.io/badge/SENSORS-MULTI--TELEMETRY-a855f7?style=flat-square" alt="Sensors" />
-</p>
-
-Autonomous embedded hospital assistant engineered with low-level sensor telemetry acquisition and deterministic motor actuation. Integrates ultrasonic time-of-flight obstacle avoidance, environmental temperature/humidity sensors, fail-safe motor drive circuits, and custom KiCad printed circuit board routing.
-
-* ⚡ **Tech Stack**: `Embedded C / C++`, `Arduino AVR`, `KiCad PCB`, `PWM Motor Controllers`, `Ultrasonic & Environmental Sensors`
-* 🔗 [View GitHub Repository](https://github.com/shreyasjaradhya) &bull; [KiCad Schematic & Gerber Files](https://github.com/shreyasjaradhya) &bull; [Hardware Prototype Demo](https://github.com/shreyasjaradhya)
-
----
-
-### 🛠 Tech Stack & Silicon Tools
-
-| Domain | Technologies, Tools & Frameworks |
-| :--- | :--- |
-| **Hardware & HDLs** | `Verilog HDL` `SystemVerilog` `FPGA Synthesis` `Digital Logic Design` `RTL Verification` `Computer Architecture` |
-| **EDA & CAD Suites** | `Xilinx Vivado` `ModelSim` `KiCad PCB` `LTspice` `MATLAB` `Simulink` `GTKWave` |
-| **Languages & Firmware** | `C` `Embedded C` `Python` `Java` `Assembly (RISC-V/8051)` `Bash / Linux` |
-| **Full-Stack & Systems** | `Next.js 16` `TypeScript` `React` `Supabase (PostgreSQL)` `Tailwind CSS` `REST APIs` `Git` |
-
----
-
-### 🏆 National Honors & Verified Credentials
-
-| Credential / Distinction | Organization / Issuer | Scope & Significance |
-| :--- | :--- | :--- |
-| **MY Bharat Budget Quest 2026 – Final Round** | Ministry of Youth Affairs & Sports, Govt. of India | **National Final Round Shortlist (Top 0.1% of 12+ Lakh Candidates)** — Direct National Virtual Dialogue with the Prime Minister of India |
-| **Certificate of Presentation – AIDE 2026** | IEEE & NMAMIT | **International Conference Paper Presentation** — Research on predictive machine learning architectures |
-| **AIC Nitte Technical Residency** | Atal Incubation Centre Nitte | **Startup Technology Incubation** — Hands-on embedded prototyping & hardware innovation |
-
----
-
-### 📊 GitHub Activity & Real-Time Metrics
+### GitHub Statistics
 
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=shreyasjaradhya&show_icons=true&theme=tokyonight&hide_border=true&bg_color=050505&title_color=38bdf8&icon_color=4ade80&text_color=e2e8f0" alt="Shreyas's GitHub Stats" width="49%" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=shreyasjaradhya&layout=compact&theme=tokyonight&hide_border=true&bg_color=050505&title_color=38bdf8&text_color=e2e8f0" alt="Top Languages" width="47%" />
-</div>
+  <table border="0" style="border: none;">
+    <tr style="border: none;">
+      <td width="50%" align="center" style="border: none;">
+        <img src="https://github-readme-stats.vercel.app/api?username=shreyasjaradhya&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=38bdf8&icon_color=22c55e&text_color=94a3b8" alt="GitHub Stats" width="100%" />
+      </td>
+      <td width="50%" align="center" style="border: none;">
+        <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=shreyasjaradhya&layout=compact&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=38bdf8&text_color=94a3b8" alt="Top Languages" width="100%" />
+      </td>
+    </tr>
+  </table>
 
-<br>
+  <br>
 
-<div align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=shreyasjaradhya&theme=tokyonight&hide_border=true&background=050505&ring=38bdf8&fire=22c55e&currStreakLabel=38bdf8" alt="GitHub Streak" width="97%" />
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=shreyasjaradhya&theme=tokyonight&hide_border=true&background=0d1117&ring=38bdf8&fire=22c55e&currStreakLabel=38bdf8" alt="GitHub Streak" width="100%" />
 </div>
 
 ---
 
-### 🤝 Let's Collaborate
+### Activity
 
-I am actively open to engineering roles and technical collaborations in **VLSI Design, FPGA Engineering, Embedded Hardware Development, and Digital System Architecture**.
+<div align="center">
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=shreyasjaradhya&theme=tokyo-night&bg_color=0d1117&color=38bdf8&line=22c55e&point=38bdf8&hide_border=true" alt="Contribution Activity Graph" width="100%" />
+</div>
 
-* 🌐 **Portfolio**: [shreyasjaradhya.vercel.app](https://github.com/shreyasjaradhya)
-* 💼 **LinkedIn**: [linkedin.com/in/shreyas-aradhya](https://linkedin.com)
+---
+
+### Connect With Me
+
+* 💼 **LinkedIn**: [Add Your LinkedIn Profile URL Here](https://linkedin.com/in/)
+* 🌐 **Portfolio**: [View Portfolio](https://github.com/shreyasjaradhya/my-portfolio-next)
+* 🐙 **GitHub**: [@shreyasjaradhya](https://github.com/shreyasjaradhya)
 * ✉️ **Email**: [shreyasjaradhya@gmail.com](mailto:shreyasjaradhya@gmail.com)
-* 📍 **Location**: Karnataka, India
+
+---
+
+<div align="center">
+  <sub>Building at the intersection of electronics, logic, and innovation.</sub>
+</div>
