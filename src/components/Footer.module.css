@@ -48,6 +48,40 @@
   letter-spacing: 0.1em;
 }
 
+.socialLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+}
+
+.socialLink:hover {
+  color: var(--text-accent);
+  border-color: var(--border-glow);
+  background: var(--bg-glass-hover);
+  box-shadow: var(--glow-shadow);
+  transform: translateY(-1px);
+}
+
 .copyright {
   color: rgba(255, 255, 255, 0.3);
   font-size: 0.85rem;

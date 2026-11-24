@@ -87,21 +87,25 @@ export default function Contact({ profile }: { profile: Profile | null }) {
         </p>
         
         <div className={styles.buttonGroup}>
-          {profile?.email && (
-            <a href={`mailto:${profile.email}`} className={styles.primaryBtn}>
-              Direct Email
-            </a>
-          )}
-          {profile?.github_url && (
-            <a href={profile.github_url} target="_blank" rel="noopener noreferrer" className={styles.secondaryBtn}>
-              GitHub
-            </a>
-          )}
-          {profile?.linkedin_url && (
-            <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className={styles.secondaryBtn}>
-              LinkedIn
-            </a>
-          )}
+          <a href={`mailto:${profile?.email || "shreyasjaradhya@gmail.com"}`} className={styles.primaryBtn}>
+            Direct Email
+          </a>
+          <a
+            href={profile?.github_url || "https://github.com/shreyasjaradhya"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.secondaryBtn}
+          >
+            GitHub ↗
+          </a>
+          <a
+            href={profile?.linkedin_url || "https://linkedin.com"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.secondaryBtn}
+          >
+            LinkedIn ↗
+          </a>
         </div>
 
         <div className={styles.formContainer}>

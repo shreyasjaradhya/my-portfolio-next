@@ -425,6 +425,15 @@ export default function PerspectiveTunnelHero({
             >
               Explore My Work
             </Link>
+            <a
+              href={profile?.github_url || "https://github.com/shreyasjaradhya"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.secondaryBtn}
+              aria-label="GitHub Profile"
+            >
+              GitHub ↗
+            </a>
             <Link
               href="#contact"
               onClick={handleContactClick}

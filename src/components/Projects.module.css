@@ -289,9 +289,45 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 2rem;
   margin-top: 3.5rem;
   position: relative;
+}
+
+.actionButtonsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.githubMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.githubMoreBtn:hover {
+  border-color: var(--border-glow);
+  background: var(--bg-glass-hover);
+  color: var(--text-accent);
+  box-shadow: var(--glow-shadow);
+  transform: translateY(-2px);
 }
 
 .viewMoreBtn {
