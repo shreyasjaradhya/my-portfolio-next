@@ -6,69 +6,29 @@ import * as motion from "framer-motion/client";
 import styles from "./Certifications.module.css";
 import type { Certification } from "@/lib/supabase/types";
 
-// Genuine reference certificates matching the layout and achievements
-const FALLBACK_CERTIFICATES: Certification[] = [
-  {
-    id: "fallback-1",
-    name: "MY Bharat Budget Quest 2026 – Final Round",
-    issuer: "Ministry of Youth Affairs & Sports",
-    issue_date: "2026-04-12",
-    credential_url: "#experience",
-    certificate_url: "",
-    description: "Shortlisted out of over 12 lakh participants for the Final Round of MY Bharat Budget Quest 2026—a prestigious National-Level Virtual Dialogue with the Hon'ble Prime Minister of India, Shri Narendra Modi ji.",
-    tags: ["National Round", "Virtual Dialogue", "Public Policy"],
-    issuer_logo_url: "/logos/emblem_india.svg",
-    callout: "Organized by Ministry of Youth Affairs & Sports",
-    action_label: "View Experience →",
-    display_order: 1,
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "fallback-2",
-    name: "Certificate of Presentation – AIDE 2026",
-    issuer: "IEEE & NMAMIT",
-    issue_date: "2026-02-01",
-    credential_url: "#projects",
-    certificate_url: "",
-    description: "Presented the research paper on machine learning for marketing prediction at the IEEE AIDE 2026 International Conference.",
-    tags: ["Paper Presentation", "Research"],
-    issuer_logo_url: "/logos/ieee.svg",
-    callout: "Organized by IEEE & NMAMIT",
-    action_label: "View Project →",
-    display_order: 2,
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "fallback-3",
-    name: "AIC Nitte Internship",
-    issuer: "Atal Incubation Centre Nitte",
-    issue_date: "2025-05-01",
-    credential_url: "#experience",
-    certificate_url: "",
-    description: "Completed a hands-on internship at Atal Incubation Centre Nitte, gaining practical experience in tech innovation, startup incubation processes, and entrepreneurship.",
-    tags: ["1 Event Photos", "Tech Innovation"],
-    issuer_logo_url: "/logos/aim.svg",
-    callout: "Completed in under 4 months.",
-    action_label: "View Experience →",
-    display_order: 3,
-    created_at: new Date().toISOString()
-  }
-];
-
 export default function Certifications({ certifications }: { certifications: Certification[] }) {
   const [showAll, setShowAll] = useState(false);
 
-  // If database contains real certificates (excluding dummy cms test), use them.
-  // Otherwise use the verified reference certificate entries.
-  const activeCerts = (certifications && certifications.length > 0 && !certifications.every(c => c.name.toLowerCase().includes("test")))
-    ? certifications
-    : FALLBACK_CERTIFICATES;
+  // Filter out any previous dummy/reference certificates so ONLY user-uploaded/edited certificates are shown
+  const activeCerts = (certifications || []).filter((cert) => {
+    const name = (cert.name || "").toLowerCase();
+    return (
+      !name.includes("my bharat budget") &&
+      !name.includes("aide 2026") &&
+      !name.includes("aic nitte") &&
+      !name.includes("test")
+    );
+  });
+
+  // Only render section if user has uploaded real certificates
+  if (!activeCerts || activeCerts.length === 0) {
+    return null;
+  }
 
   const displayedCerts = showAll ? activeCerts : activeCerts.slice(0, 3);
 
   const formatDisplayDate = (cert: Certification) => {
     if (!cert.issue_date) return null;
-    if (cert.id === "fallback-1") return "Completed: April 12-13, 2026";
     try {
       const d = new Date(cert.issue_date);
       if (isNaN(d.getTime())) return `Completed: ${cert.issue_date}`;
@@ -97,9 +57,7 @@ export default function Certifications({ certifications }: { certifications: Cer
         {/* 3-Column Certificates Grid */}
         <div className={styles.grid}>
           {displayedCerts.map((cert, index) => {
-            const tags = cert.tags && cert.tags.length > 0
-              ? cert.tags
-              : (cert.description && cert.description.includes("c programming") ? ["C", "Programming"] : []);
+            const tags = cert.tags && cert.tags.length > 0 ? cert.tags : [];
 
             return (
               <motion.div

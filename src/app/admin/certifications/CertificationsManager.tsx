@@ -395,91 +395,11 @@ export default function CertificationsManager({ initialCertifications }: { initi
     return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
   };
 
-  const handleImportReferenceCerts = async () => {
-    setSaving(true);
-    setError(null);
-    try {
-      const referenceCerts = [
-        {
-          name: "MY Bharat Budget Quest 2026 – Final Round",
-          issuer: "Ministry of Youth Affairs & Sports",
-          issue_date: "2026-04-12",
-          credential_url: "#experience",
-          description: "Shortlisted out of over 12 lakh participants for the Final Round of MY Bharat Budget Quest 2026—a prestigious National-Level Virtual Dialogue with the Hon'ble Prime Minister of India, Shri Narendra Modi ji.",
-          tags: ["National Round", "Virtual Dialogue", "Public Policy"],
-          issuer_logo_url: "/logos/emblem_india.svg",
-          callout: "Organized by Ministry of Youth Affairs & Sports",
-          action_label: "View Experience →",
-          display_order: 1
-        },
-        {
-          name: "Certificate of Presentation – AIDE 2026",
-          issuer: "IEEE & NMAMIT",
-          issue_date: "2026-02-01",
-          credential_url: "#projects",
-          description: "Presented the research paper on machine learning for marketing prediction at the IEEE AIDE 2026 International Conference.",
-          tags: ["Paper Presentation", "Research"],
-          issuer_logo_url: "/logos/ieee.svg",
-          callout: "Organized by IEEE & NMAMIT",
-          action_label: "View Project →",
-          display_order: 2
-        },
-        {
-          name: "AIC Nitte Internship",
-          issuer: "Atal Incubation Centre Nitte",
-          issue_date: "2025-05-01",
-          credential_url: "#experience",
-          description: "Completed a hands-on internship at Atal Incubation Centre Nitte, gaining practical experience in tech innovation, startup incubation processes, and entrepreneurship.",
-          tags: ["1 Event Photos", "Tech Innovation"],
-          issuer_logo_url: "/logos/aim.svg",
-          callout: "Completed in under 4 months.",
-          action_label: "View Experience →",
-          display_order: 3
-        }
-      ];
-
-      for (const cert of referenceCerts) {
-        const exists = certifications.some(c => c.name.toLowerCase() === cert.name.toLowerCase());
-        if (!exists) {
-          let { error: insertErr } = await supabase.from("certifications").insert([cert]);
-          if (insertErr && (insertErr.message?.toLowerCase().includes("column") || insertErr.message?.toLowerCase().includes("tags"))) {
-            const simplified = {
-              name: cert.name,
-              issuer: cert.issuer,
-              issue_date: cert.issue_date,
-              credential_url: cert.credential_url,
-              description: cert.description,
-              display_order: cert.display_order
-            };
-            await supabase.from("certifications").insert([simplified]);
-          }
-        }
-      }
-
-      revalidateHomepage().catch(console.warn);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Failed to import reference certificates.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <>
       <div className={styles.actionHeader}>
         <h2 className={styles.sectionTitle}>Certificates & Achievements</h2>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          {certifications.length < 3 && (
-            <button
-              type="button"
-              onClick={handleImportReferenceCerts}
-              className={styles.secondaryButton}
-              disabled={saving}
-            >
-              ⚡ Import 3 Reference Certificates
-            </button>
-          )}
           <button onClick={openAddForm} className={styles.addButton}>
             + Add Certificate
           </button>
@@ -540,7 +460,13 @@ export default function CertificationsManager({ initialCertifications }: { initi
           </div>
         ))}
         {certifications.length === 0 && (
-          <p style={{ color: 'var(--text-secondary)' }}>No certificates found. Add your first one!</p>
+          <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            <p style={{ margin: 0, fontSize: '1.05rem', fontWeight: 500, color: 'var(--text-primary)' }}>No certificates added yet.</p>
+            <p style={{ margin: '0.5rem 0 1.25rem', fontSize: '0.9rem' }}>Upload your certificate documents (PDF/Image), certificate title, issuer, and completion dates.</p>
+            <button onClick={openAddForm} className={styles.addButton}>
+              + Add Certificate
+            </button>
+          </div>
         )}
       </div>
 
@@ -557,11 +483,11 @@ export default function CertificationsManager({ initialCertifications }: { initi
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label htmlFor="name" className={styles.label}>Certificate Name *</label>
-                  <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} className={styles.input} disabled={saving} placeholder="e.g. MY Bharat Budget Quest 2026 – Final Round" />
+                  <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} className={styles.input} disabled={saving} placeholder="e.g. SystemVerilog Verification Certificate" />
                 </div>
                 <div className={styles.inputGroup}>
                   <label htmlFor="issuer" className={styles.label}>Issuing Organization / Institution *</label>
-                  <input id="issuer" name="issuer" type="text" value={formData.issuer} onChange={handleChange} className={styles.input} disabled={saving} placeholder="e.g. Ministry of Youth Affairs & Sports" />
+                  <input id="issuer" name="issuer" type="text" value={formData.issuer} onChange={handleChange} className={styles.input} disabled={saving} placeholder="e.g. IEEE / NMAMIT / Coursera" />
                 </div>
               </div>
 
