@@ -9,14 +9,13 @@ import type { Certification } from "@/lib/supabase/types";
 export default function Certifications({ certifications }: { certifications: Certification[] }) {
   const [showAll, setShowAll] = useState(false);
 
-  // Filter out any previous dummy/reference certificates so ONLY user-uploaded/edited certificates are shown
+  // Filter out only the 3 removed default dummy certificates so all real user certificates show
   const activeCerts = (certifications || []).filter((cert) => {
     const name = (cert.name || "").toLowerCase();
     return (
       !name.includes("my bharat budget") &&
       !name.includes("aide 2026") &&
-      !name.includes("aic nitte") &&
-      !name.includes("test")
+      !name.includes("aic nitte")
     );
   });
 
