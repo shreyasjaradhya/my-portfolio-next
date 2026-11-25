@@ -10,6 +10,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import styles from "./perspective-tunnel-hero.module.css";
+import { getSocialLinks } from "@/lib/social";
 import type { Profile } from "@/lib/supabase/types";
 
 export interface TunnelCardItem {
@@ -426,13 +427,22 @@ export default function PerspectiveTunnelHero({
               Explore My Work
             </Link>
             <a
-              href={profile?.github_url || "https://github.com/shreyasjaradhya"}
+              href={getSocialLinks(profile).githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.secondaryBtn}
               aria-label="GitHub Profile"
             >
               GitHub ↗
+            </a>
+            <a
+              href={getSocialLinks(profile).linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.secondaryBtn}
+              aria-label="LinkedIn Profile"
+            >
+              LinkedIn ↗
             </a>
             <Link
               href="#contact"

@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/supabase/types";
 import styles from "./profile.module.css";
 import { revalidateHomepage } from "../actions";
+import { DEFAULT_GITHUB_URL, DEFAULT_LINKEDIN_URL } from "@/lib/social";
 
 export default function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
   const router = useRouter();
@@ -328,6 +329,7 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Profil
             type="url"
             value={formData.github_url}
             onChange={handleChange}
+            placeholder={DEFAULT_GITHUB_URL}
             className={styles.input}
             disabled={saving}
           />
@@ -341,6 +343,7 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Profil
             type="url"
             value={formData.linkedin_url}
             onChange={handleChange}
+            placeholder={DEFAULT_LINKEDIN_URL}
             className={styles.input}
             disabled={saving}
           />

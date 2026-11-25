@@ -22,9 +22,9 @@ VALUES (
 My technical journey involves working with Verilog, C, Python, MATLAB, and FPGA development tools such as Xilinx Vivado. Through academic projects and hands-on engineering experience, I''ve explored digital system design, hardware implementation, control systems, and embedded applications.
 
 My long-term goal is to build a career in VLSI and hardware engineering, developing efficient, reliable, and innovative electronic systems. I''m always eager to learn, collaborate with others, and take on challenging projects that help me grow as an engineer.',
-    NULL,
-    NULL,
-    NULL
+    'shreyasjaradhya@gmail.com',
+    'https://github.com/shreyasjaradhya',
+    'https://www.linkedin.com/in/shreyas-aradhya-0b9592321'
 );
 
 -- ==============================================================================

@@ -125,7 +125,7 @@
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
 }
 
-.githubBtn {
+.socialBtn {
   font-size: 0.85rem;
   font-weight: 600;
   font-family: var(--font-mono);
@@ -145,7 +145,7 @@
   text-decoration: none;
 }
 
-.githubBtn:hover {
+.socialBtn:hover {
   color: var(--text-primary);
   border-color: var(--border-glow);
   background: var(--bg-glass-hover);
@@ -153,11 +153,11 @@
   transform: translateY(-1px);
 }
 
-@media (max-width: 480px) {
-  .githubBtn span {
+@media (max-width: 560px) {
+  .socialBtn span {
     display: none;
   }
-  .githubBtn {
+  .socialBtn {
     padding: 0.4rem 0.55rem;
   }
 }
@@ -187,14 +187,24 @@
     pointer-events: none;
   }
 
+  .actionsBox {
+    gap: 0.4rem;
+  }
+
   .logo {
     font-size: 0.82rem;
     padding: 0.4rem 0.9rem;
   }
 
+  .motionBtn,
   .resumeBtn {
     font-size: 0.78rem;
-    padding: 0.4rem 0.85rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .socialBtn {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.7rem;
   }
 
   .navPillWrap {

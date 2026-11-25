@@ -6,8 +6,10 @@ import * as motion from "framer-motion/client";
 import styles from "./Contact.module.css";
 import type { Profile } from "@/lib/supabase/types";
 import { supabase } from "@/lib/supabase/client";
+import { getSocialLinks } from "@/lib/social";
 
 export default function Contact({ profile }: { profile: Profile | null }) {
+  const { githubUrl, linkedinUrl, email } = getSocialLinks(profile);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -87,11 +89,11 @@ export default function Contact({ profile }: { profile: Profile | null }) {
         </p>
         
         <div className={styles.buttonGroup}>
-          <a href={`mailto:${profile?.email || "shreyasjaradhya@gmail.com"}`} className={styles.primaryBtn}>
+          <a href={`mailto:${email}`} className={styles.primaryBtn}>
             Direct Email
           </a>
           <a
-            href={profile?.github_url || "https://github.com/shreyasjaradhya"}
+            href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.secondaryBtn}
@@ -99,7 +101,7 @@ export default function Contact({ profile }: { profile: Profile | null }) {
             GitHub ↗
           </a>
           <a
-            href={profile?.linkedin_url || "https://linkedin.com"}
+            href={linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.secondaryBtn}
