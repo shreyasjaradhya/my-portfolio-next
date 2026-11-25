@@ -169,9 +169,9 @@ export default function Projects({ projects }: { projects: Project[] }) {
                   </button>
 
                   <div className={styles.footerRightActions}>
-                    {project.github_url && (
+                    {(project.github_url || getProjectReport(project)?.repoUrl) && (
                       <a
-                        href={project.github_url}
+                        href={project.github_url || getProjectReport(project)?.repoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.liveDemoBtn}

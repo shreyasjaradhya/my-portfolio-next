@@ -117,15 +117,24 @@ export default function ProjectReportContent({
           >
             Print / Save PDF
           </button>
-          {project.github_url && (
+          {(project.github_url || report?.repoUrl) && (
             <a
-              href={project.github_url}
+              href={project.github_url || report?.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.secondaryActionBtn}
             >
               <GitHubIcon size={15} />
               <span>Source Code ↗</span>
+            </a>
+          )}
+          {report?.documentDownloadUrl && (
+            <a
+              href={report.documentDownloadUrl}
+              download={report.documentDownloadName || true}
+              className={styles.secondaryActionBtn}
+            >
+              <span>Download Original {report.documentDownloadName?.endsWith('.pptx') ? 'PPTX' : 'PDF'} ↓</span>
             </a>
           )}
           {project.live_url && (

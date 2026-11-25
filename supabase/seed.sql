@@ -52,7 +52,7 @@ VALUES (
 -- ==============================================================================
 -- PROJECTS
 -- ==============================================================================
-INSERT INTO projects (title, slug, description, detailed_description, technologies, featured, display_order)
+INSERT INTO projects (title, slug, description, detailed_description, technologies, featured, display_order, github_url)
 VALUES 
 (
     'Hospital Management System using Python',
@@ -61,7 +61,8 @@ VALUES
     'Developed a Python-based Hospital Management System to automate and optimize hospital administration from patient admission to discharge. Features menu-driven patient registration, ID-based record lookup, deletion of outdated records, persistent file handling (patients.txt), timestamped itemized billing (Ward Charges = Days × Daily Rate + Medicine Charges + Consultation Fee), and automated discharge bill delivery via SMTP.',
     ARRAY['Python', 'File Handling', 'SMTP', 'Email Automation', 'Date and Time Module'],
     true,
-    1
+    1,
+    'https://github.com/shreyasjaradhya/hospital-management-system-python'
 ),
 (
     'Digital Timer using FPGA',
@@ -70,7 +71,8 @@ VALUES
     'Designed a synchronous FPGA digital timer in Verilog HDL using hierarchical clock-enable division, cascaded BCD seconds/minutes counters (00-59), Start/Pause/Reset FSM control, and a time-division multiplexed 7-segment display driver verified through behavioral RTL testbenches.',
     ARRAY['FPGA', 'Verilog', 'Digital Design'],
     true,
-    2
+    2,
+    'https://github.com/shreyasjaradhya/digital-timer-fpga'
 ),
 (
     'Traffic Light Controller',
@@ -79,7 +81,8 @@ VALUES
     'Modeled and verified a deterministic Moore Finite State Machine (FSM) intersection traffic controller in Verilog HDL cycling safely across NS_GREEN, NS_YELLOW, EW_GREEN, and EW_YELLOW phases with synchronous dwell timers and mutual-exclusion lamp checks.',
     ARRAY['Verilog', 'FSM', 'Digital Electronics'],
     true,
-    3
+    3,
+    'https://github.com/shreyasjaradhya/traffic-light-controller'
 ),
 (
     'Arduino Hospital Robot',
@@ -88,7 +91,8 @@ VALUES
     'Engineered an embedded autonomous hospital utility prototype using Arduino and Embedded C/C++ integrating HC-SR04 ultrasonic time-of-flight collision avoidance, ward temperature and humidity telemetry, and PWM differential H-bridge DC motor control.',
     ARRAY['Arduino', 'Sensors', 'C/C++'],
     true,
-    4
+    4,
+    'https://github.com/shreyasjaradhya/arduino-hospital-robot'
 ),
 (
     'Frequency-Selective Circuit',
@@ -97,7 +101,8 @@ VALUES
     'Designed, simulated in LTspice, and verified on Zero PCB a single-input analog frequency-selective indicator for Analog Electronics Circuits (AEC). Uses a Low-Pass Filter (R = 3.3 kOhm, C = 0.01 uF for 0-5 kHz) and cascaded Band-Pass Filter (2.7 kOhm HPF + 1.3 kOhm LPF for 6-12 kHz), LM358/LM311 buffers & comparators, 1N5819 peak detectors, and 330 Ohm current-limited LED outputs tested with a function generator and DSO.',
     ARRAY['Analog Electronics', 'LTspice', 'RC Filters', 'Operational Amplifiers', 'Comparators'],
     true,
-    5
+    5,
+    'https://github.com/shreyasjaradhya/frequency-selective-circuit'
 ),
 (
     'FIFO Buffer Design and Verification using SystemVerilog',
@@ -106,7 +111,8 @@ VALUES
     'Implemented a parameterized FIFO RTL design (always_ff / always_comb) supporting byte-enable writes, flush, sync/async resets, First-Word Fall-Through (FWFT) mode, status flags, and error counters. Built an OOP SystemVerilog testbench (fifo_if modport BFM tasks, constrained-random transaction classes 50% write / 30% read / 20% burst, mailboxes, events, fork-join, and queue scoreboard) simulated at 100 MHz in ModelSim/QuestaSim and GTKWave.',
     ARRAY['SystemVerilog', 'RTL Design', 'ModelSim', 'GTKWave', 'Constrained Random Verification'],
     true,
-    6
+    6,
+    'https://github.com/shreyasjaradhya/fifo-buffer-systemverilog'
 ),
 (
     'Electronic Circuit Design and Simulation using Tinkercad',
@@ -115,7 +121,8 @@ VALUES
     'Two-week Internship I survey evaluating Autodesk Tinkercad (3D CSG & circuit simulator) at NMAMIT under Pradyumna G R. Modeled and compared Series LED circuits (3 V CR2032 split to 1.5 V per 2 V LED), Parallel LED branches (full 3 V supply illumination), and Ohm''s Law verification (9 V battery, 450 Ohm resistor, LED) against multimeter instrumentation.',
     ARRAY['Tinkercad', 'Circuit Simulation', 'Basic Electronics', 'Ohm’s Law', 'Arduino'],
     false,
-    7
+    7,
+    'https://github.com/shreyasjaradhya/tinkercad-electronic-circuit-design'
 ),
 (
     'Reactor Temperature Control',
@@ -124,7 +131,8 @@ VALUES
     'Explored closed-loop thermal regulation for industrial batch reactors exhibiting non-linear inertia and transport dead-time lags, combining predictive trajectory forecasting, adaptive ramp/setpoint error weighting, and reinforcement-learning reward concepts connected to batch reactor internship work in Manipal.',
     ARRAY['Machine Learning', 'Control Systems'],
     true,
-    9
+    9,
+    'https://github.com/shreyasjaradhya/reactor-temperature-control'
 );
 
 -- ==============================================================================

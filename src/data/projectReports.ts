@@ -40,6 +40,9 @@ export interface ProjectReport {
   dateLabel: string;
   authors: string[];
   mentorOrDept?: string;
+  repoUrl?: string;
+  documentDownloadUrl?: string;
+  documentDownloadName?: string;
   abstract: string;
   aimOrProblem: string;
   metadata: ReportMetaItem[];
@@ -73,6 +76,9 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
       "Design, LTspice simulation, and Zero PCB implementation of a dual-band frequency detector with mutually exclusive LED-1 (0–5 kHz) and LED-2 (6–12 kHz) indicators.",
     courseOrContext: "Analog Electronics Circuits (AEC) — NMAM Institute of Technology, Nitte",
     dateLabel: "March 2026",
+    repoUrl: "https://github.com/shreyasjaradhya/frequency-selective-circuit",
+    documentDownloadUrl: "https://github.com/shreyasjaradhya/frequency-selective-circuit/raw/main/docs/AEC_Project_report.pdf",
+    documentDownloadName: "AEC_Project_report.pdf",
     authors: [
       "J Shreyas Aradhya (NNM24EC065)",
       "Jayanth (NNM24EC066)",
@@ -245,6 +251,9 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
       "Jayanth (NNM24EC066)",
     ],
     mentorOrDept: "Department of Electronics & Communication Engineering, NMAMIT",
+    repoUrl: "https://github.com/shreyasjaradhya/hospital-management-system-python",
+    documentDownloadUrl: "https://github.com/shreyasjaradhya/hospital-management-system-python/raw/main/docs/Hospital-Management-System-Python-Project.pptx",
+    documentDownloadName: "Hospital-Management-System-Python-Project.pptx",
     abstract:
       "The Hospital Management System is a Python-based CLI administration solution engineered to digitize daily hospital workflows from patient registration through discharge. It eliminates manual paper ledger errors by combining structured persistent text-file record management, transparent itemized bill calculation, timestamp logging, and automated email bill delivery via SMTP.",
     aimOrProblem:
@@ -368,6 +377,9 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
     authors: ["J Shreyas Aradhya (NNM24EC065)"],
     mentorOrDept:
       "Mentor: Pradyumna G R (Assistant Professor) | Team: Harshit Shetty, Jeethesh, Jayanth, Anvidh, Inchara",
+    repoUrl: "https://github.com/shreyasjaradhya/tinkercad-electronic-circuit-design",
+    documentDownloadUrl: "https://github.com/shreyasjaradhya/tinkercad-electronic-circuit-design/raw/main/docs/Tinkercad_Survey_Report.pdf",
+    documentDownloadName: "Tinkercad_Survey_Report.pdf",
     abstract:
       "This internship evaluated Autodesk Tinkercad—a browser-accessible Constructive Solid Geometry (CSG) 3D CAD and interactive electronic circuit simulation suite—for designing and understanding fundamental electronic circuits. Multiple circuits including series LED chains, parallel resistor-LED branches, Ohm's Law verification setups, voltage dividers, and simple Arduino circuits were modeled and cross-checked with multimeter measurements against theoretical electrical calculations.",
     aimOrProblem:
@@ -491,6 +503,9 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
       "Jayanth Reddy (NNM24EC066)",
     ],
     mentorOrDept: "Department of Electronics & Communication Engineering",
+    repoUrl: "https://github.com/shreyasjaradhya/fifo-buffer-systemverilog",
+    documentDownloadUrl: "https://github.com/shreyasjaradhya/fifo-buffer-systemverilog/raw/main/docs/SVL_REPORT.pdf",
+    documentDownloadName: "SVL_REPORT.pdf",
     abstract:
       "This project implements both the synthesizable RTL design and a complete object-oriented verification environment for a parameterized First-In-First-Out (FIFO) buffer in SystemVerilog. Beyond standard read/write logic, the RTL supports configurable data width and depth, byte-enable writes, synchronous/asynchronous reset, flush, First-Word Fall-Through (FWFT) mode, status flags, and error/performance counters. A class-based testbench using inheritance, constrained randomization, modport BFMs, mailboxes, events, fork-join concurrency, and a queue-based scoreboard validates corner cases and randomized traffic.",
     aimOrProblem:
@@ -642,6 +657,7 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
     dateLabel: "2025",
     authors: ["J Shreyas Aradhya (NNM24EC065)"],
     mentorOrDept: "Department of Electronics & Communication Engineering",
+    repoUrl: "https://github.com/shreyasjaradhya/digital-timer-fpga",
     abstract:
       "This project implements a synchronous digital timer in Verilog HDL targeting FPGA deployment. High-frequency onboard crystal clock ticks are divided down into deterministic 1 Hz and multiplexed scan enables via parameterizable synchronous modulus counters. The timing core tracks minutes and seconds in Binary-Coded Decimal (BCD) format under an FSM controller supporting start, pause, and synchronous reset states while driving multi-digit 7-segment LEDs without flicker.",
     aimOrProblem:
@@ -764,6 +780,7 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
     dateLabel: "2025",
     authors: ["J Shreyas Aradhya (NNM24EC065)"],
     mentorOrDept: "Department of Electronics & Communication Engineering",
+    repoUrl: "https://github.com/shreyasjaradhya/traffic-light-controller",
     abstract:
       "This project models and verifies an automated multi-way intersection traffic light controller built around a deterministic Moore Finite State Machine (FSM) in Verilog HDL. By separating sequential state storage, next-state timing transitions, and pure state-based signal lamp decoding, the architecture structurally guarantees that conflicting directional Green signals can never assert simultaneously—even during reset or transitional yellow phases.",
     aimOrProblem:
@@ -892,6 +909,7 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
     dateLabel: "2025",
     authors: ["J Shreyas Aradhya (NNM24EC065)"],
     mentorOrDept: "Department of Electronics & Communication Engineering",
+    repoUrl: "https://github.com/shreyasjaradhya/arduino-hospital-robot",
     abstract:
       "The Arduino Hospital Robot is an embedded mobile robotics prototype built to demonstrate contactless corridor navigation and ward environmental sensing. Powered by an Arduino microcontroller programmed in Embedded C/C++, the platform continuously measures obstacle distance via ultrasonic time-of-flight ranging, monitors ambient temperature and humidity, and executes real-time differential drive actuation through a dual H-bridge motor driver.",
     aimOrProblem:
@@ -1016,6 +1034,9 @@ export const PROJECT_REPORTS: Record<string, ProjectReport> = {
     dateLabel: "2025",
     authors: ["J Shreyas Aradhya (NNM24EC065)"],
     mentorOrDept: "Control Systems & Batch Reactor Process Exploration",
+    repoUrl: "https://github.com/shreyasjaradhya/reactor-temperature-control",
+    documentDownloadUrl: "https://github.com/shreyasjaradhya/reactor-temperature-control/raw/main/docs/Adaptive_Ensemble_Reinforcement_Learning.pdf",
+    documentDownloadName: "Adaptive_Ensemble_Reinforcement_Learning.pdf",
     abstract:
       "Industrial batch reactors present demanding temperature control challenges characterized by non-linear reaction kinetics, asymmetric heating/cooling actuator capacities, and substantial thermal dead-time lags. Building on hands-on internship exposure to batch reactor processes in Manipal, this project explores predictive modeling, adaptive error weighting, and reinforcement-learning concepts to stabilize reactor temperature tightly while minimizing thermal overshoot.",
     aimOrProblem:
