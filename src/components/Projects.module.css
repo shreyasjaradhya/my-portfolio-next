@@ -406,3 +406,129 @@
     border-radius: 14px;
   }
 }
+
+/* Interactive Card Banner & Report Badge */
+.clickableImage {
+  cursor: pointer;
+}
+
+.reportPill {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(5, 5, 5, 0.72);
+  color: var(--text-accent);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.footerRightActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Full Report Modal */
+.reportModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(5, 5, 8, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.reportModalPanel {
+  width: 100%;
+  max-width: 980px;
+  max-height: 90vh;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.reportModalTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.35rem;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-glass);
+  gap: 0.75rem;
+}
+
+.modalNavGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modalNavBtn,
+.modalCloseBtn {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.38rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalNavBtn:hover,
+.modalCloseBtn:hover {
+  color: var(--text-accent);
+  border-color: var(--border-glow);
+  background: var(--bg-glass-hover);
+}
+
+.modalCounter {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  padding: 0 0.25rem;
+}
+
+.reportModalScrollBody {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .reportModalBackdrop {
+    padding: 0.5rem;
+  }
+
+  .reportModalPanel {
+    max-height: 94vh;
+    border-radius: 18px;
+  }
+
+  .reportModalTopBar {
+    padding: 0.7rem 0.9rem;
+  }
+
+  .reportModalScrollBody {
+    padding: 1rem;
+  }
+}

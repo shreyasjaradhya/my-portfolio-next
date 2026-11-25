@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "./Navbar.module.css";
 import ThemeToggle from "./ThemeToggle";
 import LiquidNavbar, {
@@ -23,6 +24,7 @@ const SECTION_IDS = [
 ];
 
 export default function Navbar({ profile }: { profile: Profile | null }) {
+  const pathname = usePathname();
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const [isSwarmOpen, setIsSwarmOpen] = useState(false);
@@ -66,8 +68,12 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
     return () => observer.disconnect();
   }, []);
 
-  // Scroll spy to update the active liquid droplet position as the user scrolls
+  const isHome = pathname === "/";
+
+  // Scroll spy to update the active liquid droplet position as the user scrolls on the homepage
   useEffect(() => {
+    if (!isHome) return;
+
     const handleScroll = () => {
       if (isNavigatingRef.current) return;
       const scrollPosition = window.scrollY + 160;
@@ -87,7 +93,7 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   const handleNavChange = useCallback((index: number) => {
     setActiveSectionIndex(index);
@@ -97,14 +103,19 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
     }, 850);
   }, []);
 
+  const hrefPrefix = isHome ? "" : "/";
+
   const navItems: LiquidNavItem[] = [
-    { label: "Home", href: "#home", icon: NimbusIcons.home, fx: "glow" },
-    { label: "About", href: "#about", icon: NimbusIcons.about, fx: "wave" },
-    { label: "Skills", href: "#skills", icon: NimbusIcons.skills, fx: "drop" },
-    { label: "Projects", href: "#projects", icon: NimbusIcons.projects, fx: "pop" },
-    { label: "Experience", href: "#experience", icon: NimbusIcons.experience, fx: "spin" },
-    { label: "Contact", href: "#contact", icon: NimbusIcons.contact, fx: "plane" },
+    { label: "Home", href: `${hrefPrefix}#home`, icon: NimbusIcons.home, fx: "glow" },
+    { label: "About", href: `${hrefPrefix}#about`, icon: NimbusIcons.about, fx: "wave" },
+    { label: "Skills", href: `${hrefPrefix}#skills`, icon: NimbusIcons.skills, fx: "drop" },
+    { label: "Projects", href: `${hrefPrefix}#projects`, icon: NimbusIcons.projects, fx: "pop" },
+    { label: "Experience", href: `${hrefPrefix}#experience`, icon: NimbusIcons.experience, fx: "spin" },
+    { label: "Contact", href: `${hrefPrefix}#contact`, icon: NimbusIcons.contact, fx: "plane" },
   ];
+
+  const effectiveActiveIndex =
+    pathname && pathname.startsWith("/projects") ? 3 : activeSectionIndex;
 
   const { githubUrl, linkedinUrl } = getSocialLinks(profile);
 
@@ -113,7 +124,7 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
       <div className={styles.navbarContainer}>
         <div className={styles.mobileTopBar}>
           <div className={styles.logoBox}>
-            <Link href="#home" className={styles.logo}>
+            <Link href={`${hrefPrefix}#home`} className={styles.logo}>
               {profile?.name?.toUpperCase() || "J SHREYAS ARADHYA"}
             </Link>
           </div>
@@ -173,7 +184,7 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
         <div className={styles.navPillWrap}>
           <LiquidNavbar
             items={navItems}
-            active={activeSectionIndex}
+            active={effectiveActiveIndex}
             onChange={handleNavChange}
             tone={theme}
             sound={true}
