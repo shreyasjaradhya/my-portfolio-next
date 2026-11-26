@@ -237,20 +237,21 @@ export default function PerspectiveTunnelHero({
     let touchStartY = 0;
 
     const onWheel = (e: WheelEvent) => {
+      if (stage.isMobile || window.innerWidth < 1024) return;
       const current = rawProgress.get();
 
       if (e.deltaY > 0) {
         // Scrolling down
         if (current < 0.96) {
           e.preventDefault();
-          const step = Math.min(e.deltaY * 0.0014, 0.08);
+          const step = Math.min(e.deltaY * 0.003, 0.15);
           rawProgress.set(Math.min(1, current + step));
         }
       } else if (e.deltaY < 0) {
         // Scrolling up
         if (window.scrollY <= 10 && current > 0.02) {
           e.preventDefault();
-          const step = Math.min(Math.abs(e.deltaY) * 0.0014, 0.08);
+          const step = Math.min(Math.abs(e.deltaY) * 0.003, 0.15);
           rawProgress.set(Math.max(0, current - step));
         }
       }
@@ -263,7 +264,7 @@ export default function PerspectiveTunnelHero({
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!e.touches[0] || stage.isMobile) return;
+      if (!e.touches[0] || stage.isMobile || window.innerWidth < 1024) return;
       const current = rawProgress.get();
       const deltaY = touchStartY - e.touches[0].clientY;
 
@@ -281,9 +282,17 @@ export default function PerspectiveTunnelHero({
     };
 
     const onWindowScroll = () => {
-      if (window.scrollY > 80 && rawProgress.get() < 0.98) {
+      const scrollY = window.scrollY;
+      const isMobile = stage.isMobile || window.innerWidth < 1024;
+      if (isMobile) {
+        const heroHeight = window.innerHeight || 800;
+        const progress = Math.min(1, Math.max(0, scrollY / (heroHeight * 0.4)));
+        rawProgress.set(progress);
+        return;
+      }
+      if (scrollY > 80 && rawProgress.get() < 0.98) {
         rawProgress.set(1);
-      } else if (window.scrollY === 0 && rawProgress.get() > 0.98) {
+      } else if (scrollY === 0 && rawProgress.get() > 0.98) {
         rawProgress.set(0);
       }
     };
@@ -299,7 +308,7 @@ export default function PerspectiveTunnelHero({
       container.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("scroll", onWindowScroll);
     };
-  }, [rawProgress]);
+  }, [rawProgress, stage.isMobile]);
 
   const pointer = useCameraParallax(!isReducedMotion && !stage.isMobile);
 
@@ -341,7 +350,7 @@ export default function PerspectiveTunnelHero({
     } else {
       window.location.hash = sectionId;
     }
-  }, [rawProgress]);
+  }, [rawProgress, stage.isMobile]);
 
   const handleProjectsClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
