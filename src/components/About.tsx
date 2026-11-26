@@ -1,4 +1,5 @@
 /* eslint-disable */
+import Image from "next/image";
 import * as motion from "framer-motion/client";
 import styles from "./About.module.css";
 import type { Profile, Education, Experience } from "@/lib/supabase/types";
@@ -79,11 +80,14 @@ My long-term goal is to build a career in VLSI and hardware engineering, develop
           >
             <div className={styles.imageFrame}>
               {profile?.profile_image_url ? (
-                <img 
+                <Image 
                   src={profile.profile_image_url} 
                   alt={profile.name || "Profile Photo"} 
+                  fill
+                  sizes="320px"
                   className={styles.profileImage} 
-                  loading="lazy"
+                  priority
+                  quality={85}
                 />
               ) : (
                 <div className={styles.placeholderPhoto}>

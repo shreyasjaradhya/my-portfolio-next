@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import * as motion from "framer-motion/client";
 import styles from "./Projects.module.css";
 import { GitHubIcon } from "./SocialIcons";
@@ -113,12 +114,18 @@ export default function Projects({ projects }: { projects: Project[] }) {
                   </div>
 
                   {project.image_url ? (
-                    <img
-                      src={project.image_url}
-                      alt={project.title}
-                      className={styles.projectImage}
-                      loading="lazy"
-                    />
+                    <>
+                      <div className={styles.imageSkeleton} aria-hidden="true" />
+                      <Image
+                        src={project.image_url}
+                        alt={project.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 380px"
+                        className={styles.projectImage}
+                        priority={idx < 3}
+                        quality={75}
+                      />
+                    </>
                   ) : (
                     <div className={styles.placeholderImage}>
                       <svg

@@ -107,7 +107,60 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
     setError(null);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImageFile = async (file: File, maxWidth = 1600, maxHeight = 1200, quality = 0.82): Promise<File> => {
+    return new Promise((resolve) => {
+      if (file.type === "image/svg+xml" || file.size < 250 * 1024) {
+        resolve(file);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(file);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob || blob.size >= file.size) {
+                resolve(file);
+                return;
+              }
+              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), {
+                type: "image/webp",
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            "image/webp",
+            quality
+          );
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setError(null);
     if (!file) return;
@@ -124,8 +177,9 @@ export default function ProjectsManager({ initialProjects }: { initialProjects: 
       return;
     }
 
-    setSelectedImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    const compressed = await compressImageFile(file);
+    setSelectedImageFile(compressed);
+    setImagePreview(URL.createObjectURL(compressed));
   };
 
   const handleRemoveImage = () => {

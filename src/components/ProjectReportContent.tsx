@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./ProjectReport.module.css";
 import type { Project } from "@/lib/supabase/types";
 import type { ProjectReport } from "@/data/projectReports";
@@ -42,11 +43,14 @@ export default function ProjectReportContent({
       <header className={styles.reportHero}>
         {project.image_url && (
           <div className={styles.bannerImageWrap}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={project.image_url}
               alt={project.title}
+              fill
               className={styles.bannerImage}
+              sizes="(max-width: 1024px) 100vw, 900px"
+              priority
+              quality={80}
             />
             <div className={styles.bannerOverlay} />
           </div>
