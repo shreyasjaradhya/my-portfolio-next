@@ -22,11 +22,13 @@ export default function Achievements({ achievements }: { achievements: Achieveme
     <section id="achievements" className={styles.section}>
       <div className={styles.container}>
         <motion.div
+          className={styles.header}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
+          <div className={styles.subtitle}>// Honors &amp; Recognitions</div>
           <h2 className={styles.heading}>Achievements.</h2>
         </motion.div>
 

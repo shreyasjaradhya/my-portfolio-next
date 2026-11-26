@@ -361,7 +361,11 @@
 
 @media (max-width: 768px) {
   .experienceSection {
-    padding: 5rem 1.25rem;
+    padding: 5rem 1rem;
+  }
+
+  .header {
+    margin-bottom: 2.5rem;
   }
 
   .heading {
@@ -374,20 +378,20 @@
   }
 
   .imageWrapper {
-    height: 180px;
+    height: 175px;
     border-radius: 14px;
   }
 
   .cardTitle {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 
   .cardDesc {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .tag {
-    padding: 0.35rem 0.9rem;
-    font-size: 0.78rem;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.76rem;
   }
 }

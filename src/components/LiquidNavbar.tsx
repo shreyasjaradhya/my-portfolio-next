@@ -140,7 +140,7 @@ const NIMBUS_CSS = `
 .nimbus-item{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:999px;background:none;color:var(--n-fg-soft);
   font-family:inherit;font-weight:500;font-size:14px;line-height:1;letter-spacing:-.01em;text-decoration:none;cursor:pointer;transition:color .25s}
 .nimbus-item:hover,.nimbus-item[aria-current="page"]{color:var(--n-fg)}
-.nimbus-item:focus-visible{outline:2px solid #00A2FF;outline-offset:2px}
+.nimbus-item:focus,.nimbus-item:focus-visible{outline:none}
 .nv-ico{position:relative;display:inline-flex;flex:none}
 .nv-ico svg{transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
 .nimbus-item[aria-current="page"] .nv-ico svg{transform:translateY(-1px) scale(1.08)}
@@ -630,7 +630,7 @@ export function LiquidNavbar({
               const id = it.href.slice(1)
               const el = document.getElementById(id)
               if (el) {
-                const navOffset = 90
+                const navOffset = typeof window !== "undefined" && window.innerWidth <= 1024 ? 120 : 90
                 const elementPosition = el.getBoundingClientRect().top
                 const offsetPosition = elementPosition + window.pageYOffset - navOffset
                 window.scrollTo({

@@ -233,11 +233,11 @@
 
 @media (max-width: 768px) {
   .aboutSection {
-    padding: 5rem 1.5rem;
+    padding: 5rem 1rem;
   }
 
   .header {
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
   }
 
   .heading {
@@ -245,17 +245,17 @@
   }
 
   .imageColumn {
-    width: 260px;
+    width: 250px;
   }
 
   .imageFrame {
-    width: 260px;
-    height: 380px;
-    border-radius: 32px;
+    width: 250px;
+    height: 360px;
+    border-radius: 28px;
   }
 
   .profileImage {
-    border-radius: 32px;
+    border-radius: 28px;
   }
 
   .cardsGrid {
@@ -265,17 +265,19 @@
 
   .card {
     border-radius: 22px;
-    padding: 1.5rem 1.25rem;
+    padding: 1.5rem 1.15rem;
     min-height: auto;
   }
 
   .bioWrapper {
-    margin-top: 30px;
+    margin-top: 25px;
     gap: 16px;
+    padding: 0 0.25rem;
   }
 
   .bioParagraph {
-    font-size: 1rem;
+    font-size: 0.98rem;
+    line-height: 1.7;
   }
 }
 

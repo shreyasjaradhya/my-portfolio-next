@@ -125,7 +125,8 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
         <div className={styles.mobileTopBar}>
           <div className={styles.logoBox}>
             <Link href={`${hrefPrefix}#home`} className={styles.logo}>
-              {profile?.name?.toUpperCase() || "J SHREYAS ARADHYA"}
+              <span className={styles.logoFull}>{profile?.name?.toUpperCase() || "J SHREYAS ARADHYA"}</span>
+              <span className={styles.logoShort}>J. SHREYAS</span>
             </Link>
           </div>
 

@@ -263,7 +263,7 @@ export default function PerspectiveTunnelHero({
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!e.touches[0]) return;
+      if (!e.touches[0] || stage.isMobile) return;
       const current = rawProgress.get();
       const deltaY = touchStartY - e.touches[0].clientY;
 
@@ -430,7 +430,7 @@ export default function PerspectiveTunnelHero({
               href={getSocialLinks(profile).githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.secondaryBtn}
+              className={`${styles.secondaryBtn} ${styles.desktopOnlyHeroBtn}`}
               aria-label="GitHub Profile"
             >
               GitHub ↗
@@ -439,7 +439,7 @@ export default function PerspectiveTunnelHero({
               href={getSocialLinks(profile).linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={styles.secondaryBtn}
+              className={`${styles.secondaryBtn} ${styles.desktopOnlyHeroBtn}`}
               aria-label="LinkedIn Profile"
             >
               LinkedIn ↗
@@ -457,7 +457,7 @@ export default function PerspectiveTunnelHero({
                 href={profile.resume_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={styles.secondaryBtn}
+                className={`${styles.secondaryBtn} ${styles.desktopOnlyHeroBtn}`}
                 aria-label="View Resume"
               >
                 Resume ↗
@@ -466,7 +466,7 @@ export default function PerspectiveTunnelHero({
               <Link
                 href="#about"
                 onClick={handleAboutClick}
-                className={styles.secondaryBtn}
+                className={`${styles.secondaryBtn} ${styles.desktopOnlyHeroBtn}`}
                 aria-label="View About Section"
               >
                 Resume ↗

@@ -30,6 +30,7 @@ function getSkillLogo(name: string) {
   if (n.includes("digital")) return DigitalElectronicsLogo;
   if (n.includes("microcontroller")) return MicrocontrollerLogo;
   if (n.includes("embedded")) return EmbeddedSystemsLogo;
+  if (n.includes("verification")) return VLSILogo;
   if (n.includes("pcb")) return PCBDesignLogo;
   if (n.includes("arduino")) return ArduinoLogo;
   if (n.includes("matlab")) return MatlabLogo;
@@ -128,7 +129,7 @@ export default function Skills({ skills }: { skills?: Skill[] }) {
               <div className={styles.cardTitle}>
                 <span>{category}</span>
                 <span className={styles.categoryTag}>
-                  {groupedSkills[category].length} Skills
+                  {groupedSkills[category].length} {groupedSkills[category].length === 1 ? "Skill" : "Skills"}
                 </span>
               </div>
               <ul className={styles.list}>

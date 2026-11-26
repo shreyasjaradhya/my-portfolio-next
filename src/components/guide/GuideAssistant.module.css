@@ -536,13 +536,31 @@
   padding: 0 2px;
 }
 
+.desktopOnlyBtn {
+  display: flex;
+}
+
+.desktopOnlyHint {
+  display: inline;
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
+  .desktopOnlyBtn {
+    display: none !important;
+  }
+
+  .desktopOnlyHint {
+    display: none !important;
+  }
+
   .floatingTrigger {
-    bottom: 18px;
-    right: 18px;
-    padding: 10px 16px 10px 12px;
-    font-size: 0.88rem;
+    bottom: 16px;
+    right: 16px;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border-radius: 50%;
   }
 
   .modalBackdrop {
@@ -559,7 +577,38 @@
     border: none;
   }
 
+  .suggestionsContainer {
+    padding: 8px 12px;
+  }
+
   .suggestionsGrid {
-    max-height: 90px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    max-height: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .suggestionsGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .suggestionChip {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  .inputContainer {
+    padding: 10px 12px 14px;
+  }
+
+  .inputFooterHint {
+    justify-content: center;
+    text-align: center;
   }
 }

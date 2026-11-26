@@ -282,7 +282,7 @@ export default function GuideAssistant() {
                 <button
                   type="button"
                   onClick={() => setIsFullScreen((prev) => !prev)}
-                  className={styles.headerBtn}
+                  className={`${styles.headerBtn} ${styles.desktopOnlyBtn}`}
                   title={isFullScreen ? "Exit Full Screen" : "Full Screen Mode"}
                   aria-label="Toggle Full Screen"
                 >
@@ -445,7 +445,7 @@ export default function GuideAssistant() {
 
               <div className={styles.inputFooterHint}>
                 <span>Powered by verified portfolio intelligence</span>
-                <span>Enter ↵ to send • Shift+Enter for new line</span>
+                <span className={styles.desktopOnlyHint}>Enter ↵ to send • Shift+Enter for new line</span>
               </div>
             </div>
           </div>
