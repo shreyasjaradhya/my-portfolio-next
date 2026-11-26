@@ -122,7 +122,7 @@ export async function buildPortfolioKnowledge(): Promise<PortfolioKnowledge> {
     };
   });
 
-  return {
+  const result: PortfolioKnowledge = {
     engineerName: profile?.name || "J Shreyas Aradhya",
     field: profile?.title || "Electronics and Communication Engineering",
     institution: "NMAM Institute of Technology (NMAMIT), Nitte",
