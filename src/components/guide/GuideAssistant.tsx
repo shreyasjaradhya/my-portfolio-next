@@ -28,12 +28,18 @@ export default function GuideAssistant() {
     },
   ]);
 
+  const chatBodyRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll to bottom of messages
+  // Auto-scroll inside chat body without shifting the modal window position
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTo({
+        top: chatBodyRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   };
 
   useEffect(() => {
@@ -262,7 +268,12 @@ export default function GuideAssistant() {
             if (e.target === e.currentTarget) setIsOpen(false);
           }}
         >
-          <div className={`${styles.chatWindow} ${isFullScreen ? styles.chatWindowFullScreen : ""}`}>
+          <div
+            className={`${styles.chatWindow} ${isFullScreen ? styles.chatWindowFullScreen : ""}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guide-agent-title"
+          >
             {/* Header */}
             <div className={styles.chatHeader}>
               <div className={styles.headerLeft}>
@@ -271,7 +282,7 @@ export default function GuideAssistant() {
                 </div>
                 <div className={styles.headerText}>
                   <div className={styles.headerTitleRow}>
-                    <h2 className={styles.agentName}>Guide</h2>
+                    <h2 id="guide-agent-title" className={styles.agentName}>Guide</h2>
                     <span className={styles.statusIndicator}>
                       <span className={styles.statusDot} /> Online
                     </span>
@@ -323,7 +334,7 @@ export default function GuideAssistant() {
             </div>
 
             {/* Messages Body */}
-            <div className={styles.chatBody}>
+            <div ref={chatBodyRef} className={styles.chatBody}>
               {messages.map((msg) => (
                 <div
                   key={msg.id}
