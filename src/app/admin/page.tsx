@@ -134,6 +134,14 @@ export default async function AdminDashboard() {
               </div>
               <span className={styles.statValue} style={{ fontSize: "1.05rem", color: "#38bdf8" }}>Active</span>
             </Link>
+
+            <Link href="/admin/analytics" className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statIcon} aria-hidden="true">📈</span>
+                <span className={styles.statLabel}>Website Analytics</span>
+              </div>
+              <span className={styles.statValue} style={{ fontSize: "1.05rem", color: "#34d399" }}>Live</span>
+            </Link>
           </div>
 
           {/* Side Panel */}
@@ -143,6 +151,7 @@ export default async function AdminDashboard() {
                 <span aria-hidden="true">⚡</span> Quick Actions
               </h3>
               <div className={styles.quickActions}>
+                <Link href="/admin/analytics" className={styles.actionLink} style={{ color: "#34d399", fontWeight: 600 }}>📈 Website Analytics Dashboard</Link>
                 <Link href="/admin/guide" className={styles.actionLink} style={{ color: "#38bdf8", fontWeight: 600 }}>🤖 Configure Guide AI Assistant</Link>
                 <Link href="/admin/profile" className={styles.actionLink}>Edit Profile Overview</Link>
                 <Link href="/admin/projects" className={styles.actionLink}>Manage Projects</Link>
