@@ -238,7 +238,7 @@ export default function GuideAssistant() {
 
   return (
     <>
-      {/* 1. Floating Launch Button (Icon Only) */}
+      {/* 1. Floating Launch Button (Glittery Black Circular FAB Icon) */}
       {!isOpen && (
         <button
           type="button"
@@ -247,7 +247,10 @@ export default function GuideAssistant() {
           aria-label="Ask Guide - AI Portfolio Assistant"
           title="Ask Guide - AI Portfolio Assistant"
         >
-          <AiIcon size={24} />
+          <AiIcon size={24} className={styles.triggerIcon} />
+          <span className={styles.floatingTooltip}>
+            Ask Guide <span className={styles.statusDotPulse} />
+          </span>
         </button>
       )}
 

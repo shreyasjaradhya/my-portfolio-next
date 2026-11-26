@@ -630,7 +630,7 @@ export function LiquidNavbar({
               const id = it.href.slice(1)
               const el = document.getElementById(id)
               if (el) {
-                const navOffset = typeof window !== "undefined" && window.innerWidth <= 1024 ? 120 : 90
+                const navOffset = typeof window !== "undefined" && window.innerWidth <= 1024 ? 120 : 110
                 const elementPosition = el.getBoundingClientRect().top
                 const offsetPosition = elementPosition + window.pageYOffset - navOffset
                 window.scrollTo({
