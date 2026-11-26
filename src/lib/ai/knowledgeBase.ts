@@ -41,7 +41,17 @@ export interface PortfolioKnowledge {
   }>;
 }
 
+// In-memory cache for compiled knowledge base with 5-minute TTL to ensure fast responses
+let cachedKnowledge: PortfolioKnowledge | null = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 export async function buildPortfolioKnowledge(): Promise<PortfolioKnowledge> {
+  const now = Date.now();
+  if (cachedKnowledge && now - lastCacheTimestamp < CACHE_TTL_MS) {
+    return cachedKnowledge;
+  }
+
   const supabase = createPublicClient();
 
   // Retrieve dynamic records from database (with safe fallback)
@@ -173,6 +183,12 @@ export async function buildPortfolioKnowledge(): Promise<PortfolioKnowledge> {
     })),
     projects: compiledProjects,
   };
+
+  // Cache compiled knowledge
+  cachedKnowledge = result;
+  lastCacheTimestamp = Date.now();
+
+  return result;
 }
 
 export function formatKnowledgeForPrompt(knowledge: PortfolioKnowledge): string {

@@ -23,9 +23,13 @@ async function callGemini(apiKey: string, options: DispatchOptions): Promise<Rea
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
 
+  const abortCtrl = new AbortController();
+  const timeoutId = setTimeout(() => abortCtrl.abort(), 6000);
+
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal: abortCtrl.signal,
     body: JSON.stringify({
       contents,
       systemInstruction: {
@@ -36,7 +40,7 @@ async function callGemini(apiKey: string, options: DispatchOptions): Promise<Rea
         maxOutputTokens: 1200,
       },
     }),
-  });
+  }).finally(() => clearTimeout(timeoutId));
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -227,10 +231,10 @@ function createTextStream(text: string): ReadableStream<Uint8Array> {
           controller.close();
           return;
         }
-        const slice = words.slice(i, i + 3).join(" ") + (i + 3 < words.length ? " " : "");
+        const slice = words.slice(i, i + 4).join(" ") + (i + 4 < words.length ? " " : "");
         controller.enqueue(encoder.encode(slice));
-        i += 3;
-        setTimeout(pushChunk, 15);
+        i += 4;
+        setTimeout(pushChunk, 6);
       }
       pushChunk();
     },

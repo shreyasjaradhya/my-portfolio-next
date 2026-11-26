@@ -32,13 +32,10 @@ export default function GuideAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll inside chat body without shifting the modal window position
+  // Auto-scroll inside chat body directly to bottom without shaking or shifting the window
   const scrollToBottom = () => {
     if (chatBodyRef.current) {
-      chatBodyRef.current.scrollTo({
-        top: chatBodyRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   };
 
@@ -60,24 +57,44 @@ export default function GuideAssistant() {
     }
   }, [isOpen]);
 
+  // Handle mobile browser/hardware back button so it closes Guide without leaving the portfolio
+  useEffect(() => {
+    if (isOpen) {
+      window.history.pushState({ guideModalOpen: true }, "");
+
+      const handlePopState = () => {
+        setIsOpen(false);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+  }, [isOpen]);
+
   // Handle ESC key to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  // Robust close handler supporting both touch and click
+  // Robust close handler supporting click, touch, and history pop
   const handleClose = (e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    setIsOpen(false);
+    if (typeof window !== "undefined" && window.history.state?.guideModalOpen) {
+      window.history.back();
+    } else {
+      setIsOpen(false);
+    }
   };
 
   // Auto-resize textarea
@@ -369,7 +386,7 @@ export default function GuideAssistant() {
             </div>
 
             {/* Messages Body */}
-            <div ref={chatBodyRef} className={styles.chatBody}>
+            <div ref={chatBodyRef} className={styles.messagesContainer}>
               {messages.map((msg) => (
                 <div
                   key={msg.id}
