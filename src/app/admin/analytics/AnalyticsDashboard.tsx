@@ -178,6 +178,139 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     return { icon: "🌐", label: source || "External", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.35)" };
   };
 
+  // Helper to resolve exact project and report titles from paths
+  const getProjectOrPageDetails = (path: string) => {
+    const raw = (path || "").trim();
+    const p = raw.toLowerCase();
+
+    const isReportModal = p.includes("[full report modal]") || p.includes("[report modal]") || p.includes("#report");
+    const isReportDownload = p.includes("[download") || p.includes("[print");
+
+    if (p === "/" || p === "") {
+      return {
+        title: "Portfolio Landing",
+        type: "Homepage",
+        badge: "Overview",
+        badgeColor: "#38bdf8",
+        icon: "🏠",
+        cleanPath: "/",
+      };
+    }
+
+    if (p.includes("reactor-temperature-control")) {
+      return {
+        title: "Reactor Temperature Control System",
+        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
+        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "🔬 Project",
+        badgeColor: isReportModal ? "#10b981" : "#38bdf8",
+        icon: "🔬",
+        cleanPath: "/projects/reactor-temperature-control",
+      };
+    }
+
+    if (p.includes("arduino-hospital-robot") || p.includes("hospital-robot")) {
+      return {
+        title: "Arduino Hospital Robot",
+        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
+        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "🤖 Project",
+        badgeColor: isReportModal ? "#10b981" : "#38bdf8",
+        icon: "🤖",
+        cleanPath: "/projects/arduino-hospital-robot",
+      };
+    }
+
+    if (p.includes("frequency-selective")) {
+      return {
+        title: "Frequency-Selective Circuit",
+        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
+        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "📻 Project",
+        badgeColor: isReportModal ? "#10b981" : "#38bdf8",
+        icon: "📻",
+        cleanPath: "/projects/frequency-selective-circuit",
+      };
+    }
+
+    if (p.includes("fifo-buffer")) {
+      return {
+        title: "FIFO Buffer Design & SystemVerilog",
+        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
+        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "💾 Project",
+        badgeColor: isReportModal ? "#10b981" : "#38bdf8",
+        icon: "💾",
+        cleanPath: "/projects/fifo-buffer",
+      };
+    }
+
+    if (p.startsWith("/projects/")) {
+      const slug = raw.replace("/projects/", "").replace(/\s*\[.*\]/, "").replace(/#.*/, "");
+      const cleanTitle = slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+      return {
+        title: cleanTitle || "Project Details",
+        type: isReportModal ? "Full Report Read" : "Project Page",
+        badge: isReportModal ? "📄 Report Read" : "📁 Project",
+        badgeColor: isReportModal ? "#10b981" : "#818cf8",
+        icon: "📁",
+        cleanPath: `/projects/${slug}`,
+      };
+    }
+
+    if (p.startsWith("/admin/analytics")) {
+      return {
+        title: "Website Traffic Analytics",
+        type: "Admin Dashboard",
+        badge: "📊 Analytics",
+        badgeColor: "#a855f7",
+        icon: "📊",
+        cleanPath: "/admin/analytics",
+      };
+    }
+
+    if (p.startsWith("/admin/messages")) {
+      return {
+        title: "Recruiter Messages Inbox",
+        type: "Admin Messages",
+        badge: "📬 Inbox",
+        badgeColor: "#a855f7",
+        icon: "📬",
+        cleanPath: "/admin/messages",
+      };
+    }
+
+    if (p.startsWith("/admin/guide")) {
+      return {
+        title: "Portfolio AI Guide",
+        type: "AI Assistant",
+        badge: "💡 AI Guide",
+        badgeColor: "#a855f7",
+        icon: "💡",
+        cleanPath: "/admin/guide",
+      };
+    }
+
+    if (p.startsWith("/admin")) {
+      return {
+        title: "Portfolio Admin Portal",
+        type: "Admin Session",
+        badge: "🛡️ Admin",
+        badgeColor: "#a855f7",
+        icon: "⚙️",
+        cleanPath: raw,
+      };
+    }
+
+    return {
+      title: raw,
+      type: "Portfolio Page",
+      badge: "Route",
+      badgeColor: "#64748b",
+      icon: "🌐",
+      cleanPath: raw,
+    };
+  };
+
   // Filter trends by selected time range
   const visibleTrends = trends.slice(-timeRange);
 
@@ -966,7 +1099,7 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
               </span>
             </div>
             <p className={styles.cardSubtitle}>
-              Stream of the latest 25 visits showing who browsed, where they came from, and which pages they viewed.
+              Stream of recent visits showing who browsed, where they arrived from, exact arrival date &amp; time, and exact projects or reports read.
             </p>
           </div>
 
@@ -1005,63 +1138,86 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
             <div className={styles.feedList}>
               {filteredVisits.map((visit) => {
                 const refBadge = getReferrerBadge(visit.referrer);
+                const pageDetails = getProjectOrPageDetails(visit.pagePath);
+
                 return (
                   <div
                     key={visit.id}
-                    className={`${styles.feedItem} ${visit.isAdmin ? styles.feedItemAdmin : styles.feedItemPublic}`}
+                    className={`${styles.feedCardItem} ${visit.isAdmin ? styles.feedItemAdmin : styles.feedItemPublic}`}
                   >
-                    <div className={styles.feedLeftCol}>
-                      {/* Audience badge */}
-                      {visit.isAdmin ? (
-                        <span className={styles.badgeAdmin}>
-                          <span>🛡️</span> Me (Admin)
-                        </span>
-                      ) : (
-                        <span className={styles.badgePublic}>
-                          <span>🌐</span> Guest / Recruiter
-                        </span>
-                      )}
+                    {/* Top Row: Visitor Identity, Location, Traffic Source, Device */}
+                    <div className={styles.feedCardTopRow}>
+                      <div className={styles.feedAudienceAndLocation}>
+                        {visit.isAdmin ? (
+                          <span className={styles.badgeAdmin}>
+                            <span>🛡️</span> You (Admin Session)
+                          </span>
+                        ) : (
+                          <span className={styles.badgePublic}>
+                            <span>🌐</span> Real External Guest / Recruiter
+                          </span>
+                        )}
 
-                      {/* Location: Flag + City, Country */}
-                      <div className={styles.feedLocation}>
-                        <span className={styles.feedFlag}>{visit.countryFlag}</span>
-                        <span className={styles.feedLocationText}>
-                          {visit.city && visit.city !== "Unknown" ? `${visit.city}, ` : ""}
-                          {visit.country}
+                        <div className={styles.feedLocation}>
+                          <span className={styles.feedFlag}>{visit.countryFlag}</span>
+                          <span className={styles.feedLocationText}>
+                            {visit.city && visit.city !== "Unknown" ? `${visit.city}, ` : ""}
+                            {visit.country}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className={styles.feedMetaTags}>
+                        <span
+                          className={styles.feedSourceBadge}
+                          style={{
+                            backgroundColor: refBadge.bg,
+                            borderColor: refBadge.border,
+                            color: refBadge.color,
+                          }}
+                        >
+                          <span>{refBadge.icon}</span>
+                          <span>{refBadge.label}</span>
+                        </span>
+
+                        <span className={styles.feedDeviceBadge}>
+                          {visit.deviceType.toLowerCase().includes("mobile") ? "📱 Mobile" : "💻 Desktop"}
                         </span>
                       </div>
                     </div>
 
-                    <div className={styles.feedMidCol}>
-                      {/* Traffic Source */}
-                      <span
-                        className={styles.feedSourceBadge}
-                        style={{
-                          backgroundColor: refBadge.bg,
-                          borderColor: refBadge.border,
-                          color: refBadge.color,
-                        }}
-                      >
-                        <span>{refBadge.icon}</span>
-                        <span>{refBadge.label}</span>
-                      </span>
+                    {/* Mid Row: Exact Project / Page Explored + Exact Arrival Date & Time */}
+                    <div className={styles.feedCardMidRow}>
+                      <div className={styles.pageDetailsBlock}>
+                        <span className={styles.pageIcon}>{pageDetails.icon}</span>
+                        <div className={styles.pageTextGroup}>
+                          <div className={styles.pageTitleLine}>
+                            <strong className={styles.pageTitle}>{pageDetails.title}</strong>
+                            <span
+                              className={styles.pageTypeBadge}
+                              style={{
+                                backgroundColor: `${pageDetails.badgeColor}18`,
+                                borderColor: `${pageDetails.badgeColor}40`,
+                                color: pageDetails.badgeColor,
+                              }}
+                            >
+                              {pageDetails.badge}
+                            </span>
+                          </div>
+                          <span className={styles.pageCleanPath}>{pageDetails.cleanPath}</span>
+                        </div>
+                      </div>
 
-                      {/* Route Path */}
-                      <span className={styles.feedPathBadge} title={visit.pagePath}>
-                        {visit.pagePath === "/" ? "Home (/)" : visit.pagePath}
-                      </span>
-                    </div>
-
-                    <div className={styles.feedRightCol}>
-                      {/* Device */}
-                      <span className={styles.feedDeviceBadge}>
-                        {visit.deviceType.toLowerCase().includes("mobile") ? "📱 Mobile" : "💻 Desktop"}
-                      </span>
-
-                      {/* Time */}
-                      <span className={styles.feedTime} title={new Date(visit.visitedAt).toLocaleString()}>
-                        {visit.timeAgo}
-                      </span>
+                      {/* Exact Arrival Date & Time */}
+                      <div className={styles.feedExactTimeBlock}>
+                        <div className={styles.exactTimeLine}>
+                          <span className={styles.clockIcon}>🕒</span>
+                          <span className={styles.exactTimeText}>
+                            {visit.exactTime ? `${visit.exactTime} • ${visit.exactDate}` : new Date(visit.visitedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
+                        <span className={styles.relativeTimeText}>{visit.timeAgo}</span>
+                      </div>
                     </div>
                   </div>
                 );

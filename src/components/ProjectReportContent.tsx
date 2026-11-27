@@ -7,6 +7,7 @@ import styles from "./ProjectReport.module.css";
 import type { Project } from "@/lib/supabase/types";
 import type { ProjectReport } from "@/data/projectReports";
 import { GitHubIcon } from "./SocialIcons";
+import { trackAnalyticsEvent } from "./analytics/AnalyticsTracker";
 
 type ReportTab = "all" | "architecture" | "specs" | "testing";
 
@@ -116,7 +117,10 @@ export default function ProjectReportContent({
           )}
           <button
             type="button"
-            onClick={() => window.print()}
+            onClick={() => {
+              trackAnalyticsEvent(`/projects/${project.slug} [Print / Save PDF]`);
+              window.print();
+            }}
             className={styles.secondaryActionBtn}
           >
             Print / Save PDF
@@ -126,6 +130,7 @@ export default function ProjectReportContent({
               href={project.github_url || report?.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackAnalyticsEvent(`/projects/${project.slug} [Source Code Link]`)}
               className={styles.secondaryActionBtn}
             >
               <GitHubIcon size={15} />
@@ -136,6 +141,7 @@ export default function ProjectReportContent({
             <a
               href={report.documentDownloadUrl}
               download={report.documentDownloadName || true}
+              onClick={() => trackAnalyticsEvent(`/projects/${project.slug} [Downloaded Document: ${report.documentDownloadName || 'PDF'}]`)}
               className={styles.secondaryActionBtn}
             >
               <span>Download Original {report.documentDownloadName?.endsWith('.pptx') ? 'PPTX' : 'PDF'} ↓</span>

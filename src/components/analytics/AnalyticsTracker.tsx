@@ -93,6 +93,37 @@ function getTrafficSource(): string {
   }
 }
 
+/**
+ * Manually tracks a custom event or modal view (e.g. Project Full Report opened, PDF downloaded).
+ */
+export function trackAnalyticsEvent(path: string, customReferrer?: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const visitorId = getOrCreateVisitorId();
+    if (!visitorId) return;
+
+    const referrer = customReferrer || getTrafficSource();
+
+    const payload = JSON.stringify({
+      visitor_id: visitorId,
+      page_path: path,
+      referrer,
+    });
+
+    if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+      const blob = new Blob([payload], { type: "application/json" });
+      if (navigator.sendBeacon("/api/analytics/track", blob)) return;
+    }
+
+    fetch("/api/analytics/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+  } catch {}
+}
+
 export default function AnalyticsTracker() {
   const pathname = usePathname();
   const lastTrackedRef = useRef<{ path: string; time: number }>({ path: "", time: 0 });

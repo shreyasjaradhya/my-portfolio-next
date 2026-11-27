@@ -11,6 +11,7 @@ import { DEFAULT_GITHUB_URL } from "@/lib/social";
 import { getProjectReport } from "@/data/projectReports";
 import ProjectReportContent from "./ProjectReportContent";
 import type { Project } from "@/lib/supabase/types";
+import { trackAnalyticsEvent } from "./analytics/AnalyticsTracker";
 
 export default function Projects({ projects }: { projects: Project[] }) {
   const [showAll, setShowAll] = useState(false);
@@ -18,6 +19,10 @@ export default function Projects({ projects }: { projects: Project[] }) {
 
   useEffect(() => {
     if (!activeProject) return;
+
+    // Track detailed project report interaction
+    const slug = activeProject.slug || activeProject.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    trackAnalyticsEvent(`/projects/${slug} [Full Report Modal]`);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {

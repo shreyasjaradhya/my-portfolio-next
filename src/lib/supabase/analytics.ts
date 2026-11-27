@@ -68,6 +68,8 @@ export interface RecentVisit {
   deviceType: string;
   visitedAt: string;
   timeAgo: string;
+  exactDate: string;
+  exactTime: string;
 }
 
 export interface CountryStat {
@@ -150,6 +152,29 @@ export function formatTimeAgo(dateStr: string): string {
     return `${diffDay}d ago`;
   } catch {
     return "Recent";
+  }
+}
+
+/**
+ * Formats visited_at into human-readable exact date (e.g. "Nov 27, 2026") and exact time (e.g. "06:45 AM").
+ */
+export function formatExactDateTime(dateStr: string): { exactDate: string; exactTime: string } {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return { exactDate: "Recent", exactTime: "" };
+    const exactDate = d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const exactTime = d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return { exactDate, exactTime };
+  } catch {
+    return { exactDate: "Recent", exactTime: "" };
   }
 }
 
@@ -358,11 +383,13 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
       deviceType: "Desktop",
       visitedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
       timeAgo: "5m ago",
+      exactDate: formatExactDateTime(new Date(Date.now() - 5 * 60 * 1000).toISOString()).exactDate,
+      exactTime: formatExactDateTime(new Date(Date.now() - 5 * 60 * 1000).toISOString()).exactTime,
     },
     {
       id: "v-2",
       visitorId: "vid_4k18aa",
-      pagePath: "/",
+      pagePath: "/projects/arduino-hospital-robot [Full Report Modal]",
       isAdmin: false,
       referrer: "Resume PDF",
       country: "India",
@@ -371,6 +398,8 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
       deviceType: "Mobile",
       visitedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
       timeAgo: "25m ago",
+      exactDate: formatExactDateTime(new Date(Date.now() - 25 * 60 * 1000).toISOString()).exactDate,
+      exactTime: formatExactDateTime(new Date(Date.now() - 25 * 60 * 1000).toISOString()).exactTime,
     },
     {
       id: "v-3",
@@ -384,6 +413,8 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
       deviceType: "Desktop",
       visitedAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
       timeAgo: "40m ago",
+      exactDate: formatExactDateTime(new Date(Date.now() - 40 * 60 * 1000).toISOString()).exactDate,
+      exactTime: formatExactDateTime(new Date(Date.now() - 40 * 60 * 1000).toISOString()).exactTime,
     },
     {
       id: "v-4",
@@ -397,6 +428,23 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
       deviceType: "Desktop",
       visitedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
       timeAgo: "1h ago",
+      exactDate: formatExactDateTime(new Date(Date.now() - 90 * 60 * 1000).toISOString()).exactDate,
+      exactTime: formatExactDateTime(new Date(Date.now() - 90 * 60 * 1000).toISOString()).exactTime,
+    },
+    {
+      id: "v-5",
+      visitorId: "vid_7w44bc",
+      pagePath: "/",
+      isAdmin: false,
+      referrer: "LinkedIn",
+      country: "United States",
+      countryFlag: "🇺🇸",
+      city: "San Francisco",
+      deviceType: "Desktop",
+      visitedAt: new Date(Date.now() - 140 * 60 * 1000).toISOString(),
+      timeAgo: "2h ago",
+      exactDate: formatExactDateTime(new Date(Date.now() - 140 * 60 * 1000).toISOString()).exactDate,
+      exactTime: formatExactDateTime(new Date(Date.now() - 140 * 60 * 1000).toISOString()).exactTime,
     },
   ];
 
@@ -683,6 +731,7 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
     const recentRecords = [...records].reverse().slice(0, 25);
     const recentVisits: RecentVisit[] = recentRecords.map((r) => {
       const info = getCountryInfo(r.country || "Unknown");
+      const dt = formatExactDateTime(r.visited_at);
       return {
         id: r.id || `v-${Math.random()}`,
         visitorId: r.visitor_id ? `vid_${r.visitor_id.slice(0, 8)}` : "vid_anon",
@@ -695,6 +744,8 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
         deviceType: r.device_type || "Desktop",
         visitedAt: r.visited_at,
         timeAgo: formatTimeAgo(r.visited_at),
+        exactDate: dt.exactDate,
+        exactTime: dt.exactTime,
       };
     });
 

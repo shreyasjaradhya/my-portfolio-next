@@ -1257,6 +1257,134 @@
   white-space: nowrap;
 }
 
+/* Enhanced 2-Row Session Cards in Feed */
+.feedCardItem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.15s ease;
+}
+
+.feedCardItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.feedCardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.feedAudienceAndLocation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.feedMetaTags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feedCardMidRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pageDetailsBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pageIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.pageTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pageTitleLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.pageTypeBadge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  letter-spacing: 0.02em;
+}
+
+.pageCleanPath {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.73rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.feedExactTimeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.exactTimeLine {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.clockIcon {
+  font-size: 0.78rem;
+}
+
+.exactTimeText {
+  color: #cbd5e1;
+  font-family: var(--font-mono, monospace);
+}
+
+.relativeTimeText {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #64748b);
+}
+
 /* Mobile Adjustments */
 @media (max-width: 640px) {
   .container {
@@ -1305,5 +1433,16 @@
 
   .feedRightCol {
     justify-content: space-between;
+  }
+
+  .feedCardMidRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .feedExactTimeBlock {
+    align-items: flex-start;
+    text-align: left;
   }
 }
