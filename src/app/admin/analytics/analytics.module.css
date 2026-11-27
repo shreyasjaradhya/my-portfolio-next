@@ -147,7 +147,136 @@
   color: #ffffff;
 }
 
-/* 6 Metrics Grid */
+/* ==============================================================================
+   PRIMARY SEGMENT SELECTOR (ME VS OTHERS SWITCHER)
+   ============================================================================== */
+.segmentSection {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.segmentHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.segmentSubtitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.segmentTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 2px 0 0 0;
+}
+
+.audienceTabs {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.audienceTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.audienceTab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.audienceTabOthersActive {
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
+}
+
+.audienceTabMeActive {
+  background: rgba(129, 140, 248, 0.2) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  box-shadow: 0 2px 10px rgba(129, 140, 248, 0.2);
+}
+
+.audienceTabAllActive {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.audienceDotOthers {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+.audienceDotMe {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #818cf8;
+  box-shadow: 0 0 6px #818cf8;
+}
+
+.audienceTabBadge {
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 6px;
+  border-radius: 6px;
+  opacity: 0.9;
+}
+
+.segmentNotice {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #38bdf8;
+  padding: 8px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+.segmentNotice p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary, #cbd5e1);
+  line-height: 1.45;
+}
+
+/* ==============================================================================
+   6 METRICS GRID
+   ============================================================================== */
 .metricGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -203,7 +332,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Metric Main Row: Value on left, Sparkline graph on right */
 .metricMainRow {
   display: flex;
   align-items: center;
@@ -291,7 +419,124 @@
   border-radius: 4px;
 }
 
-/* Traffic Trends Chart Card */
+/* ==============================================================================
+   SIDE-BY-SIDE COMPARISON: OTHERS (LEFT) VS ME (RIGHT)
+   ============================================================================== */
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 840px) {
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.comparisonCard {
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.comparisonCardOthers {
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+}
+
+.comparisonCardMe {
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  background: linear-gradient(145deg, rgba(129, 140, 248, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+}
+
+.comparisonBadgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.badgeOthers {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+.badgeMe {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  background: rgba(129, 140, 248, 0.16);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+.comparisonPctPill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.comparisonTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.comparisonDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.comparisonStatGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.comparisonStatBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.comparisonStatNum {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.comparisonStatLbl {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ==============================================================================
+   TRAFFIC TRENDS CHART CARD
+   ============================================================================== */
 .chartSection {
   width: 100%;
 }
@@ -438,7 +683,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 0.78rem;
@@ -451,21 +696,23 @@
   gap: 8px;
 }
 
-.legendColorBoxViews {
-  width: 12px;
+.legendColorBoxOthers {
+  width: 14px;
   height: 4px;
   border-radius: 2px;
   background: #38bdf8;
 }
 
-.legendColorBoxUnique {
-  width: 12px;
+.legendColorBoxMe {
+  width: 14px;
   height: 4px;
   border-radius: 2px;
-  background: #a855f7;
+  background: #818cf8;
 }
 
-/* Visual Breakdown Grid (Donut Chart & Top Pages) */
+/* ==============================================================================
+   VISUAL BREAKDOWN GRID (DONUT CHART & TOP PAGES)
+   ============================================================================== */
 .breakdownGrid {
   display: grid;
   grid-template-columns: 1fr 1.35fr;
@@ -584,7 +831,7 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #818cf8;
 }
 
 .donutDotPublic {
@@ -606,7 +853,7 @@
   color: var(--text-secondary, #64748b);
 }
 
-/* Most Visited Pages Progress Bars */
+/* Most Visited Pages Progress Bars with Me vs Others Breakdown */
 .pageListContainer {
   display: flex;
   flex-direction: column;
@@ -632,13 +879,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 72%;
+  max-width: 65%;
 }
 
 .pageCount {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-secondary, #94a3b8);
   font-size: 0.78rem;
+  text-align: right;
+}
+
+.pageCountBreakdown {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #64748b);
 }
 
 .pageProgressBarTrack {
@@ -690,5 +943,16 @@
 
   .donutContainer {
     flex-direction: column;
+  }
+
+  .audienceTabs {
+    width: 100%;
+  }
+
+  .audienceTab {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 0.76rem;
   }
 }

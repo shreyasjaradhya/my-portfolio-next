@@ -37,9 +37,10 @@ interface AnalyticsDashboardProps {
   initialData: AnalyticsDashboardData;
 }
 
+type AudienceSegment = "others" | "me" | "all";
+
 /**
- * Lightweight vector SVG sparkline component for individual metric cards.
- * Renders instantaneously with smooth gradient fills or vertical bars.
+ * Vector SVG sparkline component for individual metric cards.
  */
 function Sparkline({
   data,
@@ -126,6 +127,7 @@ function Sparkline({
 
 export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
   const [data, setData] = useState<AnalyticsDashboardData>(initialData);
+  const [segment, setSegment] = useState<AudienceSegment>("others");
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(30);
   const [chartType, setChartType] = useState<"line" | "bar">("line");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -153,13 +155,23 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
   // Format numbers
   const formatNumber = (num: number) => num.toLocaleString();
 
+  // Active metrics based on selected segment (others vs me vs all)
+  const activeMetrics =
+    segment === "others"
+      ? summary.publicMetrics || summary
+      : segment === "me"
+      ? summary.adminMetrics || summary
+      : summary;
+
+  const isGrowthPositive = activeMetrics.growthPercentage >= 0;
+
   // Trends Line chart datasets
   const lineChartData = {
     labels: visibleTrends.map((t) => t.date),
     datasets: [
       {
-        label: "Total Page Views",
-        data: visibleTrends.map((t) => t.pageViews),
+        label: "🌐 Public Visitors (Others)",
+        data: visibleTrends.map((t) => t.publicViews),
         borderColor: "#38bdf8",
         backgroundColor: "rgba(56, 189, 248, 0.12)",
         borderWidth: 2.5,
@@ -173,18 +185,18 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
         fill: true,
       },
       {
-        label: "Unique Visitors",
-        data: visibleTrends.map((t) => t.uniqueVisitors),
-        borderColor: "#a855f7",
-        backgroundColor: "rgba(168, 85, 247, 0.08)",
+        label: "🛡️ My Admin Visits (Me)",
+        data: visibleTrends.map((t) => t.adminViews),
+        borderColor: "#818cf8",
+        backgroundColor: "rgba(129, 140, 248, 0.08)",
         borderWidth: 2,
-        pointBackgroundColor: "#a855f7",
+        pointBackgroundColor: "#818cf8",
         pointBorderColor: "#090d16",
         pointHoverBackgroundColor: "#ffffff",
-        pointHoverBorderColor: "#a855f7",
+        pointHoverBorderColor: "#818cf8",
         pointRadius: visibleTrends.length <= 14 ? 4 : 2.5,
         pointHoverRadius: 6,
-        borderDash: [4, 4],
+        borderDash: [5, 4],
         tension: 0.38,
         fill: false,
       },
@@ -196,18 +208,18 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     labels: visibleTrends.map((t) => t.date),
     datasets: [
       {
-        label: "Total Page Views",
-        data: visibleTrends.map((t) => t.pageViews),
-        backgroundColor: "rgba(56, 189, 248, 0.75)",
+        label: "🌐 Public Visitors (Others)",
+        data: visibleTrends.map((t) => t.publicViews),
+        backgroundColor: "rgba(56, 189, 248, 0.8)",
         borderColor: "#38bdf8",
         borderWidth: 1,
         borderRadius: 4,
       },
       {
-        label: "Unique Visitors",
-        data: visibleTrends.map((t) => t.uniqueVisitors),
-        backgroundColor: "rgba(168, 85, 247, 0.65)",
-        borderColor: "#a855f7",
+        label: "🛡️ My Admin Visits (Me)",
+        data: visibleTrends.map((t) => t.adminViews),
+        backgroundColor: "rgba(129, 140, 248, 0.75)",
+        borderColor: "#818cf8",
         borderWidth: 1,
         borderRadius: 4,
       },
@@ -254,7 +266,7 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
           label: (context) => {
             const label = context.dataset.label || "";
             const value = context.parsed.y ?? 0;
-            return `  ${label}: ${value.toLocaleString()}`;
+            return `  ${label}: ${value.toLocaleString()} views`;
           },
         },
       },
@@ -292,11 +304,11 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
 
   // Donut chart configuration for Admin vs Public visitor split
   const donutData = {
-    labels: ["Admin Visits", "Public Visitors"],
+    labels: ["Public Visitors (Others)", "Admin Visits (Me)"],
     datasets: [
       {
-        data: [visitorSplit?.adminVisits || 0, visitorSplit?.publicVisits || 0],
-        backgroundColor: ["#6366f1", "#38bdf8"],
+        data: [visitorSplit?.publicVisits || 0, visitorSplit?.adminVisits || 0],
+        backgroundColor: ["#38bdf8", "#818cf8"],
         borderColor: ["#090d16", "#090d16"],
         borderWidth: 3,
         hoverOffset: 6,
@@ -324,16 +336,6 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     cutout: "74%",
   };
 
-  const isGrowthPositive = summary.growthPercentage >= 0;
-  const sparklines = summary.sparklines || {
-    uniqueVisitors: [1, 1, 1, 1, 1, 1, summary.totalUniqueVisitors],
-    pageViews: [1, 2, 2, 4, 5, 6, summary.totalPageViews],
-    todayTraffic: [1, 2, 3, 4, 5, 6, summary.todayTraffic],
-    avgTraffic: [0.1, 0.2, 0.2, 0.2, 0.3, 0.3, summary.averageDailyTraffic],
-    growth: [10, 20, 30, 50, 70, 90, summary.growthPercentage],
-    adminVisits: [1, 2, 2, 3, 4, 5, summary.adminVisits],
-  };
-
   return (
     <div className={styles.dashboardContainer}>
       {/* Demo Data Indicator Banner */}
@@ -349,43 +351,142 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
         </div>
       )}
 
-      {/* 6 Metric Cards Grid with Individual Mini Sparkline Graphs */}
-      <section className={styles.metricGrid} aria-label="Website Traffic Metrics">
-        {/* 1. Total Unique Visitors */}
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>👥</span>
-            <span className={styles.metricLabel}>Total Unique Visitors</span>
+      {/* Primary Audience Segment Selector: Separate Me vs Others */}
+      <section className={styles.segmentSection} aria-label="Audience Filter">
+        <div className={styles.segmentHeaderRow}>
+          <div>
+            <span className={styles.segmentSubtitle}>Segment Traffic:</span>
+            <h2 className={styles.segmentTitle}>Who are you analyzing?</h2>
           </div>
-          <div className={styles.metricMainRow}>
-            <div className={styles.metricValue}>{formatNumber(summary.totalUniqueVisitors)}</div>
-            <Sparkline data={sparklines.uniqueVisitors} color="#a855f7" type="line" height={32} />
+
+          <div className={styles.audienceTabs} role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={segment === "others"}
+              onClick={() => setSegment("others")}
+              className={`${styles.audienceTab} ${segment === "others" ? styles.audienceTabOthersActive : ""}`}
+            >
+              <span className={styles.audienceDotOthers} />
+              <span className={styles.audienceTabLabel}>Others (Real Audience)</span>
+              <span className={styles.audienceTabBadge}>{summary.publicVisits} views</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={segment === "me"}
+              onClick={() => setSegment("me")}
+              className={`${styles.audienceTab} ${segment === "me" ? styles.audienceTabMeActive : ""}`}
+            >
+              <span className={styles.audienceDotMe} />
+              <span className={styles.audienceTabLabel}>Me (Admin Activity)</span>
+              <span className={styles.audienceTabBadge}>{summary.adminVisits} views</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={segment === "all"}
+              onClick={() => setSegment("all")}
+              className={`${styles.audienceTab} ${segment === "all" ? styles.audienceTabAllActive : ""}`}
+            >
+              <span className={styles.audienceTabLabel}>All Traffic (Combined)</span>
+              <span className={styles.audienceTabBadge}>{summary.totalPageViews} views</span>
+            </button>
           </div>
-          <div className={styles.metricSubtext}>Distinct visitors tracked</div>
         </div>
 
-        {/* 2. Total Page Views */}
+        {/* Informative Guidance Banner */}
+        <div className={styles.segmentNotice}>
+          {segment === "others" && (
+            <p>
+              <strong>🌐 Filtered to External Visitors:</strong> Excludes your own visits. This reflects actual recruiters, engineers, and outside guests exploring your portfolio.
+            </p>
+          )}
+          {segment === "me" && (
+            <p>
+              <strong>🛡️ Filtered to Your Admin Activity:</strong> Tracks your own visits while signed in as administrator (editing projects, testing features, viewing analytics).
+            </p>
+          )}
+          {segment === "all" && (
+            <p>
+              <strong>📊 Combined Traffic Overview:</strong> Displays total traffic encompassing both outside visitors and your personal admin sessions.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* 6 Metric Cards Grid tailored to current segment */}
+      <section className={styles.metricGrid} aria-label="Website Traffic Metrics">
+        {/* 1. Unique Visitors */}
+        <div className={styles.metricCard}>
+          <div className={styles.metricHeader}>
+            <span className={styles.metricIcon}>{segment === "others" ? "🌐" : segment === "me" ? "🛡️" : "👥"}</span>
+            <span className={styles.metricLabel}>
+              {segment === "others" ? "Real Unique Visitors" : segment === "me" ? "My Admin Devices" : "Total Unique Visitors"}
+            </span>
+          </div>
+          <div className={styles.metricMainRow}>
+            <div className={styles.metricValue}>{formatNumber(activeMetrics.totalUniqueVisitors)}</div>
+            <Sparkline
+              data={activeMetrics.sparklines?.uniqueVisitors || [1, 1, 1, 1, 1, 1, activeMetrics.totalUniqueVisitors]}
+              color="#38bdf8"
+              type="line"
+              height={32}
+            />
+          </div>
+          <div className={styles.metricSubtext}>
+            {segment === "others"
+              ? "Distinct external people tracked"
+              : segment === "me"
+              ? "Your authenticated sessions"
+              : "All distinct visitors"}
+          </div>
+        </div>
+
+        {/* 2. Page Views */}
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
             <span className={styles.metricIcon}>📊</span>
-            <span className={styles.metricLabel}>Total Page Views</span>
+            <span className={styles.metricLabel}>
+              {segment === "others" ? "Public Page Views" : segment === "me" ? "My Admin Views" : "Total Page Views"}
+            </span>
           </div>
           <div className={styles.metricMainRow}>
-            <div className={styles.metricValue}>{formatNumber(summary.totalPageViews)}</div>
-            <Sparkline data={sparklines.pageViews} color="#38bdf8" type="bars" height={32} />
+            <div className={styles.metricValue}>{formatNumber(activeMetrics.totalPageViews)}</div>
+            <Sparkline
+              data={activeMetrics.sparklines?.pageViews || [1, 2, 2, 4, 5, 6, activeMetrics.totalPageViews]}
+              color="#a855f7"
+              type="bars"
+              height={32}
+            />
           </div>
-          <div className={styles.metricSubtext}>Recorded page views</div>
+          <div className={styles.metricSubtext}>
+            {segment === "others"
+              ? "Recorded views from others"
+              : segment === "me"
+              ? "Your testing & admin page views"
+              : "Total recorded page views"}
+          </div>
         </div>
 
         {/* 3. Today's Traffic */}
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
             <span className={styles.metricIcon}>⚡</span>
-            <span className={styles.metricLabel}>Today's Traffic</span>
+            <span className={styles.metricLabel}>
+              {segment === "others" ? "Others' Views Today" : segment === "me" ? "My Views Today" : "Today's Traffic"}
+            </span>
           </div>
           <div className={styles.metricMainRow}>
-            <div className={styles.metricValue}>{formatNumber(summary.todayTraffic)}</div>
-            <Sparkline data={sparklines.todayTraffic} color="#fbbf24" type="line" height={32} />
+            <div className={styles.metricValue}>{formatNumber(activeMetrics.todayTraffic)}</div>
+            <Sparkline
+              data={activeMetrics.sparklines?.todayTraffic || [1, 2, 3, 4, 5, 6, activeMetrics.todayTraffic]}
+              color="#fbbf24"
+              type="line"
+              height={32}
+            />
           </div>
           <div className={styles.metricSubtext}>Views recorded today</div>
         </div>
@@ -397,8 +498,13 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
             <span className={styles.metricLabel}>Average Daily Traffic</span>
           </div>
           <div className={styles.metricMainRow}>
-            <div className={styles.metricValue}>{summary.averageDailyTraffic.toFixed(1)}</div>
-            <Sparkline data={sparklines.avgTraffic} color="#06b6d4" type="line" height={32} />
+            <div className={styles.metricValue}>{activeMetrics.averageDailyTraffic.toFixed(1)}</div>
+            <Sparkline
+              data={activeMetrics.sparklines?.avgTraffic || [0.1, 0.2, 0.2, 0.3, 0.3, activeMetrics.averageDailyTraffic]}
+              color="#06b6d4"
+              type="line"
+              height={32}
+            />
           </div>
           <div className={styles.metricSubtext}>Views / active day</div>
         </div>
@@ -416,7 +522,7 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
                   isGrowthPositive ? styles.growthPositive : styles.growthNegative
                 }`}
               >
-                {isGrowthPositive ? `+${summary.growthPercentage}%` : `${summary.growthPercentage}%`}
+                {isGrowthPositive ? `+${activeMetrics.growthPercentage}%` : `${activeMetrics.growthPercentage}%`}
               </span>
               <span
                 className={`${styles.growthPill} ${
@@ -427,31 +533,117 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
               </span>
             </div>
             <Sparkline
-              data={sparklines.growth}
+              data={activeMetrics.sparklines?.growth || [10, 20, 30, 50, 70, activeMetrics.growthPercentage]}
               color={isGrowthPositive ? "#34d399" : "#f87171"}
               type="line"
               height={32}
             />
           </div>
           <div className={styles.metricSubtext}>
-            {summary.current7DayTraffic} views vs {summary.previous7DayTraffic} (prev 7d)
+            {activeMetrics.current7DayTraffic} views vs {activeMetrics.previous7DayTraffic} (prev 7d)
           </div>
         </div>
 
-        {/* 6. Total Admin Visits */}
+        {/* 6. Ratio / Share */}
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>🛡️</span>
-            <span className={styles.metricLabel}>Total Admin Visits</span>
+            <span className={styles.metricIcon}>🎯</span>
+            <span className={styles.metricLabel}>
+              {segment === "others" ? "Public Traffic Share" : segment === "me" ? "My Admin Share" : "Traffic Split"}
+            </span>
           </div>
           <div className={styles.metricMainRow}>
-            <div className={styles.metricValue}>{formatNumber(summary.adminVisits)}</div>
-            <Sparkline data={sparklines.adminVisits} color="#6366f1" type="bars" height={32} />
+            <div className={styles.metricValue}>
+              {segment === "others"
+                ? `${visitorSplit.publicPercentage}%`
+                : segment === "me"
+                ? `${visitorSplit.adminPercentage}%`
+                : `${visitorSplit.publicPercentage}% / ${visitorSplit.adminPercentage}%`}
+            </div>
+            <Sparkline
+              data={
+                segment === "others"
+                  ? [20, 25, 25, 30, 30, visitorSplit.publicPercentage]
+                  : [70, 75, 75, 70, 70, visitorSplit.adminPercentage]
+              }
+              color={segment === "others" ? "#38bdf8" : "#818cf8"}
+              type="bars"
+              height={32}
+            />
           </div>
           <div className={styles.metricSubtext}>
             <span className={styles.includedTag}>
-              Included in overall totals ({visitorSplit?.adminPercentage || 0}%)
+              {segment === "others"
+                ? `${summary.publicVisits} of ${summary.totalPageViews} total views are Others`
+                : segment === "me"
+                ? `${summary.adminVisits} of ${summary.totalPageViews} total views are You`
+                : `${summary.publicVisits} Public • ${summary.adminVisits} Admin`}
             </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Side-by-Side Comparison: Me (Left) vs Others (Right) */}
+      <section className={styles.comparisonGrid} aria-label="Side-by-Side Comparison">
+        {/* LEFT COLUMN: OTHERS (REAL AUDIENCE) */}
+        <div className={`${styles.comparisonCard} ${styles.comparisonCardOthers}`}>
+          <div className={styles.comparisonBadgeRow}>
+            <span className={styles.badgeOthers}>🌐 OTHERS (REAL VISITORS)</span>
+            <span className={styles.comparisonPctPill}>{visitorSplit.publicPercentage}% of total traffic</span>
+          </div>
+
+          <h3 className={styles.comparisonTitle}>External Audience & Recruiters</h3>
+          <p className={styles.comparisonDesc}>
+            People who found your portfolio from GitHub, LinkedIn, resumes, or search engines.
+          </p>
+
+          <div className={styles.comparisonStatGrid}>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>{visitorSplit.publicUniqueCount}</span>
+              <span className={styles.comparisonStatLbl}>Unique People</span>
+            </div>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>{visitorSplit.publicVisits}</span>
+              <span className={styles.comparisonStatLbl}>Page Views</span>
+            </div>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>
+                {visitorSplit.publicUniqueCount > 0
+                  ? (visitorSplit.publicVisits / visitorSplit.publicUniqueCount).toFixed(1)
+                  : "0"}
+              </span>
+              <span className={styles.comparisonStatLbl}>Views / Visitor</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: ME (ADMIN / OWNER) */}
+        <div className={`${styles.comparisonCard} ${styles.comparisonCardMe}`}>
+          <div className={styles.comparisonBadgeRow}>
+            <span className={styles.badgeMe}>🛡️ ME (OWNER / ADMIN)</span>
+            <span className={styles.comparisonPctPill}>{visitorSplit.adminPercentage}% of total traffic</span>
+          </div>
+
+          <h3 className={styles.comparisonTitle}>My Personal Admin Activity</h3>
+          <p className={styles.comparisonDesc}>
+            Your own views while testing projects, updating skills, viewing reports, and checking analytics.
+          </p>
+
+          <div className={styles.comparisonStatGrid}>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>{visitorSplit.adminUniqueCount}</span>
+              <span className={styles.comparisonStatLbl}>Admin Device(s)</span>
+            </div>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>{visitorSplit.adminVisits}</span>
+              <span className={styles.comparisonStatLbl}>Testing Views</span>
+            </div>
+            <div className={styles.comparisonStatBox}>
+              <span className={styles.comparisonStatNum}>
+                {visitorSplit.adminVisits > 0 ? "Active" : "None"}
+              </span>
+              <span className={styles.comparisonStatLbl}>Session State</span>
+            </div>
           </div>
         </div>
       </section>
@@ -461,9 +653,9 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
         <div className={styles.chartCard}>
           <div className={styles.chartHeader}>
             <div>
-              <h2 className={styles.chartTitle}>Traffic Trends</h2>
+              <h2 className={styles.chartTitle}>Traffic Trends: Me vs Others</h2>
               <p className={styles.chartSubtitle}>
-                Daily page views and unique visitors over the last {timeRange} days
+                Clear visual comparison of outside visitors vs. your own admin testing over the last {timeRange} days
               </p>
             </div>
 
@@ -542,12 +734,12 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
 
           <div className={styles.chartFooter}>
             <div className={styles.legendIndicator}>
-              <span className={styles.legendColorBoxViews} />
-              <span>Page Views (Cumulative hits & route switches)</span>
+              <span className={styles.legendColorBoxOthers} />
+              <span>🌐 Public Visitors (Others) - Cyan Curve</span>
             </div>
             <div className={styles.legendIndicator}>
-              <span className={styles.legendColorBoxUnique} />
-              <span>Unique Visitors (Distinct visitor sessions)</span>
+              <span className={styles.legendColorBoxMe} />
+              <span>🛡️ My Admin Visits (Me) - Indigo Dashed</span>
             </div>
           </div>
         </div>
@@ -555,11 +747,11 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
 
       {/* Visual Analytics Breakdown Row: Visitor Split + Top Pages */}
       <section className={styles.breakdownGrid}>
-        {/* 1. Visitor Composition (Admin vs Public) Donut Graph */}
+        {/* 1. Visitor Composition (Me vs Others) Donut Graph */}
         <div className={styles.breakdownCard}>
           <div className={styles.breakdownHeader}>
-            <h3 className={styles.breakdownTitle}>Visitor Composition</h3>
-            <span className={styles.breakdownBadge}>Session Types</span>
+            <h3 className={styles.breakdownTitle}>Traffic Ratio: Me vs Others</h3>
+            <span className={styles.breakdownBadge}>Volume Split</span>
           </div>
 
           <div className={styles.donutContainer}>
@@ -574,34 +766,34 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
             <div className={styles.donutLegendList}>
               <div className={styles.donutLegendItem}>
                 <div className={styles.donutLegendLeft}>
-                  <span className={styles.donutDotAdmin} />
-                  <span>Admin Sessions</span>
-                </div>
-                <div className={styles.donutLegendRight}>
-                  <strong>{visitorSplit?.adminVisits || 0}</strong>
-                  <span className={styles.donutLegendPct}>({visitorSplit?.adminPercentage || 0}%)</span>
-                </div>
-              </div>
-
-              <div className={styles.donutLegendItem}>
-                <div className={styles.donutLegendLeft}>
                   <span className={styles.donutDotPublic} />
-                  <span>Public Visitors</span>
+                  <span>🌐 Public Visitors (Others)</span>
                 </div>
                 <div className={styles.donutLegendRight}>
                   <strong>{visitorSplit?.publicVisits || 0}</strong>
                   <span className={styles.donutLegendPct}>({visitorSplit?.publicPercentage || 0}%)</span>
                 </div>
               </div>
+
+              <div className={styles.donutLegendItem}>
+                <div className={styles.donutLegendLeft}>
+                  <span className={styles.donutDotAdmin} />
+                  <span>🛡️ My Admin Visits (Me)</span>
+                </div>
+                <div className={styles.donutLegendRight}>
+                  <strong>{visitorSplit?.adminVisits || 0}</strong>
+                  <span className={styles.donutLegendPct}>({visitorSplit?.adminPercentage || 0}%)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 2. Top Visited Pages Horizontal Graph */}
+        {/* 2. Top Visited Pages with Me vs Others Breakdown */}
         <div className={styles.breakdownCard}>
           <div className={styles.breakdownHeader}>
-            <h3 className={styles.breakdownTitle}>Most Visited Sections</h3>
-            <span className={styles.breakdownBadge}>By URL Path</span>
+            <h3 className={styles.breakdownTitle}>Pages Viewed: Me vs Others</h3>
+            <span className={styles.breakdownBadge}>By Route</span>
           </div>
 
           <div className={styles.pageListContainer}>
@@ -615,7 +807,10 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
                       {page.path === "/" ? "Home (/) - Portfolio Landing" : page.path}
                     </span>
                     <span className={styles.pageCount}>
-                      {page.views} {page.views === 1 ? "view" : "views"}
+                      <strong>{page.views}</strong> views{" "}
+                      <span className={styles.pageCountBreakdown}>
+                        ({page.publicViews} others • {page.adminViews} me)
+                      </span>
                     </span>
                   </div>
                   <div className={styles.pageProgressBarTrack}>
@@ -624,11 +819,9 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
                       style={{
                         width: `${Math.max(8, page.percentage)}%`,
                         background:
-                          idx === 0
+                          page.publicViews > page.adminViews
                             ? "linear-gradient(90deg, #38bdf8, #818cf8)"
-                            : idx === 1
-                            ? "linear-gradient(90deg, #a855f7, #c084fc)"
-                            : "linear-gradient(90deg, #34d399, #10b981)",
+                            : "linear-gradient(90deg, #818cf8, #a855f7)",
                       }}
                     />
                   </div>
