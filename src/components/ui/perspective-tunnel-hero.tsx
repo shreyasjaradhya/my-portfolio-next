@@ -21,47 +21,47 @@ export interface TunnelCardItem {
 
 export const ENGINEERING_CARDS: TunnelCardItem[] = [
   {
-    src: "https://cdn.21st.dev/assets/mirror/c3/c3fbd2afa140223999a441b32ed986f61d473930002708df805a81532a326aac.jpg",
+    src: "/images/tunnel/card-1.jpg",
     title: "VLSI DESIGN",
     category: "Hardware",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/9d/9d8b2f675a5814476ada3736ce439bcda23c5c389e0ebf9b25d8a0c09f3bbcfe.jpg",
+    src: "/images/tunnel/card-2.jpg",
     title: "FPGA DEVELOPMENT",
     category: "Architecture",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/8b/8bb738bf2f00d7f7ed3c3ec034adb9938ad38f4be4ac191d632a6a11ad525574.jpg",
+    src: "/images/tunnel/card-3.jpg",
     title: "DIGITAL SYSTEMS",
     category: "Logic Design",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/ac/ac5ac700b188d7ef16ee9dab868098b59f15c440db3f71d4e8c03262a3287577.jpg",
+    src: "/images/tunnel/card-4.jpg",
     title: "EMBEDDED SYSTEMS",
     category: "Firmware & MCU",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/ef/ef25eff6ce655fba459b3b7e7711524dc92499aa18f6c7dbea9a0fcc56a8f908.jpg",
+    src: "/images/tunnel/card-5.jpg",
     title: "HARDWARE DESIGN",
     category: "Silicon & PCB",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/f2/f28b370a5dcbf76240f1504579c4b05fc0ff0bb990a42aff8dc2f73a5dc46072.jpg",
+    src: "/images/tunnel/card-6.jpg",
     title: "INTELLIGENT SYSTEMS",
     category: "Edge Computing",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/f2/f26a1eac85704dda924820392dedfb72d51d8261d35354f83b35d683617295f3.jpg",
+    src: "/images/tunnel/card-7.jpg",
     title: "SIGNAL PROCESSING",
     category: "DSP & Comms",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/77/7755d23eaaa0aa5b403343f44afa7a29b2d06d3065fe54c602b14ba01d00f2aa.jpg",
+    src: "/images/tunnel/card-8.jpg",
     title: "ENGINEERING PROJECTS",
     category: "R&D Systems",
   },
   {
-    src: "https://cdn.21st.dev/assets/mirror/65/657317761fe9058a1d43711b13c543a71eb5199b7a5d9abf4c28479674e39cf7.jpg",
+    src: "/images/tunnel/card-9.jpg",
     title: "INNOVATION",
     category: "Next-Gen Tech",
   },
