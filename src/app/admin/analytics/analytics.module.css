@@ -915,6 +915,348 @@
   text-align: center;
 }
 
+.cardSubtitle {
+  margin: 3px 0 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.cardFooterNote {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.74rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.4;
+}
+
+.cardFooterNote code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-family: var(--font-mono, monospace);
+}
+
+/* Traffic Sources & Countries Rows */
+.sourceListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 6px;
+}
+
+.sourceRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sourceInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.sourceLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sourceIcon {
+  font-size: 0.95rem;
+}
+
+.sourceName {
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.countryFlag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.countryName {
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.countryCodeBadge {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+}
+
+.sourceCount {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.sourceCount strong {
+  color: #ffffff;
+}
+
+/* Live Visitor Activity Feed */
+.feedCard {
+  background: rgba(13, 17, 26, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.6rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.feedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.feedTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feedTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.feedLiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.feedFilterTabs {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.feedFilterTab {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.feedFilterTab:hover {
+  color: #ffffff;
+}
+
+.feedFilterTabActive {
+  background: rgba(56, 189, 248, 0.16);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.feedTableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.emptyFeed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary, #64748b);
+  gap: 8px;
+}
+
+.emptyIcon {
+  font-size: 2rem;
+}
+
+.feedList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feedItem {
+  display: grid;
+  grid-template-columns: 260px 1fr 180px;
+  align-items: center;
+  gap: 1rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.15s ease;
+}
+
+.feedItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.feedItemAdmin {
+  border-left: 3px solid #818cf8;
+}
+
+.feedItemPublic {
+  border-left: 3px solid #38bdf8;
+}
+
+.feedLeftCol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.badgeAdmin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(129, 140, 248, 0.14);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #a5b4fc;
+  white-space: nowrap;
+}
+
+.badgePublic {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+.feedLocation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedFlag {
+  font-size: 1rem;
+}
+
+.feedLocationText {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedMidCol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.feedSourceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.feedPathBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: #cbd5e1;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedRightCol {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 0.76rem;
+}
+
+.feedDeviceBadge {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.74rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.feedTime {
+  color: var(--text-secondary, #64748b);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
 /* Mobile Adjustments */
 @media (max-width: 640px) {
   .container {
@@ -954,5 +1296,14 @@
     justify-content: center;
     padding: 6px 8px;
     font-size: 0.76rem;
+  }
+
+  .feedItem {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .feedRightCol {
+    justify-content: space-between;
   }
 }

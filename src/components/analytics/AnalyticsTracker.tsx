@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "portfolio_vid";
 const COOKIE_NAME = "portfolio_vid";
+const REFERRER_STORAGE_KEY = "portfolio_ref_source";
 
 /**
  * Gets or creates an anonymous, privacy-friendly first-party visitor identifier.
  * Stored in localStorage and a 1-year SameSite=Lax cookie.
- * Does not collect PII, passwords, emails, or invasive hardware fingerprints.
  */
 function getOrCreateVisitorId(): string {
   if (typeof window === "undefined") return "";
@@ -42,6 +42,57 @@ function getOrCreateVisitorId(): string {
   }
 }
 
+/**
+ * Detects visitor acquisition source (LinkedIn, GitHub, Resume, Google, etc.).
+ * Persists during the session so subsequent subpage clicks preserve the origin.
+ */
+function getTrafficSource(): string {
+  if (typeof window === "undefined") return "Direct";
+
+  try {
+    // 1. Check if source already stored for this active session
+    const existingSource = sessionStorage.getItem(REFERRER_STORAGE_KEY);
+    if (existingSource) return existingSource;
+
+    // 2. Check URL search params (e.g. ?ref=resume or ?utm_source=linkedin)
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get("ref") || params.get("utm_source") || params.get("source");
+    if (refParam) {
+      const lower = refParam.toLowerCase();
+      let detected = "Direct";
+      if (lower.includes("resume") || lower.includes("cv")) detected = "Resume PDF";
+      else if (lower.includes("linkedin")) detected = "LinkedIn";
+      else if (lower.includes("github")) detected = "GitHub";
+      else detected = refParam.slice(0, 30);
+
+      sessionStorage.setItem(REFERRER_STORAGE_KEY, detected);
+      return detected;
+    }
+
+    // 3. Check document.referrer
+    if (document.referrer) {
+      const refUrl = new URL(document.referrer);
+      const host = refUrl.hostname.toLowerCase();
+
+      let detected = "Direct";
+      if (host.includes("linkedin.com") || host.includes("lnkd.in")) detected = "LinkedIn";
+      else if (host.includes("github.com")) detected = "GitHub";
+      else if (host.includes("google.com") || host.includes("bing.com")) detected = "Search Engine";
+      else if (host.includes("twitter.com") || host.includes("t.co") || host.includes("x.com")) detected = "Twitter / X";
+      else if (host === window.location.hostname) detected = "Direct";
+      else detected = host.replace(/^www\./, "").slice(0, 30);
+
+      sessionStorage.setItem(REFERRER_STORAGE_KEY, detected);
+      return detected;
+    }
+
+    sessionStorage.setItem(REFERRER_STORAGE_KEY, "Direct");
+    return "Direct";
+  } catch {
+    return "Direct";
+  }
+}
+
 export default function AnalyticsTracker() {
   const pathname = usePathname();
   const lastTrackedRef = useRef<{ path: string; time: number }>({ path: "", time: 0 });
@@ -60,9 +111,12 @@ export default function AnalyticsTracker() {
     const visitorId = getOrCreateVisitorId();
     if (!visitorId) return;
 
+    const referrer = getTrafficSource();
+
     const payload = JSON.stringify({
       visitor_id: visitorId,
       page_path: pathname,
+      referrer,
     });
 
     // Send tracking beacon asynchronously

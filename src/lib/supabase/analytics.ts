@@ -56,12 +56,101 @@ export interface DailyTrafficPoint {
   adminVisitors: number;
 }
 
+export interface RecentVisit {
+  id: string;
+  visitorId: string;
+  pagePath: string;
+  isAdmin: boolean;
+  referrer: string;
+  country: string;
+  countryFlag: string;
+  city: string;
+  deviceType: string;
+  visitedAt: string;
+  timeAgo: string;
+}
+
+export interface CountryStat {
+  country: string;
+  code: string;
+  flag: string;
+  views: number;
+  percentage: number;
+}
+
+export interface ReferrerStat {
+  source: string;
+  views: number;
+  percentage: number;
+}
+
 export interface AnalyticsDashboardData {
   summary: AnalyticsSummary;
   trends: DailyTrafficPoint[];
   topPages: PageBreakdown[];
   visitorSplit: VisitorSplit;
+  recentVisits: RecentVisit[];
+  topCountries: CountryStat[];
+  topReferrers: ReferrerStat[];
   isDemo: boolean;
+}
+
+/**
+ * Maps ISO 2-letter country codes to national flag emoji and friendly name.
+ */
+export function getCountryInfo(code: string): { name: string; flag: string } {
+  if (!code || code === "Unknown" || code.length !== 2) {
+    return { name: "Direct / Unknown", flag: "🌐" };
+  }
+  const upper = code.toUpperCase();
+  // Compute flag emoji from code point
+  let flag = "🌐";
+  try {
+    flag = String.fromCodePoint(...[...upper].map((c) => 127397 + c.charCodeAt(0)));
+  } catch {
+    flag = "🌐";
+  }
+
+  const names: Record<string, string> = {
+    IN: "India",
+    US: "United States",
+    GB: "United Kingdom",
+    DE: "Germany",
+    CA: "Canada",
+    AU: "Australia",
+    SG: "Singapore",
+    AE: "United Arab Emirates",
+    FR: "France",
+    NL: "Netherlands",
+    JP: "Japan",
+    BR: "Brazil",
+    IE: "Ireland",
+    SE: "Sweden",
+    CH: "Switzerland",
+  };
+
+  return { name: names[upper] || upper, flag };
+}
+
+/**
+ * Formats visited_at timestamp into human-readable relative string.
+ */
+export function formatTimeAgo(dateStr: string): string {
+  try {
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    if (diffSec < 60) return "Just now";
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHr < 24) return `${diffHr}h ago`;
+    if (diffDay === 1) return "Yesterday";
+    return `${diffDay}d ago`;
+  } catch {
+    return "Recent";
+  }
 }
 
 /**
@@ -242,6 +331,75 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
     sparklines: adminSparklines,
   };
 
+  const topReferrers: ReferrerStat[] = [
+    { source: "LinkedIn", views: Math.round(totalPageViews * 0.45), percentage: 45 },
+    { source: "Direct / Bookmark", views: Math.round(totalPageViews * 0.28), percentage: 28 },
+    { source: "GitHub", views: Math.round(totalPageViews * 0.16), percentage: 16 },
+    { source: "Resume PDF", views: Math.round(totalPageViews * 0.11), percentage: 11 },
+  ];
+
+  const topCountries: CountryStat[] = [
+    { country: "India", code: "IN", flag: "🇮🇳", views: Math.round(totalPageViews * 0.62), percentage: 62 },
+    { country: "United States", code: "US", flag: "🇺🇸", views: Math.round(totalPageViews * 0.24), percentage: 24 },
+    { country: "Germany", code: "DE", flag: "🇩🇪", views: Math.round(totalPageViews * 0.08), percentage: 8 },
+    { country: "United Kingdom", code: "GB", flag: "🇬🇧", views: Math.round(totalPageViews * 0.06), percentage: 6 },
+  ];
+
+  const recentVisits: RecentVisit[] = [
+    {
+      id: "v-1",
+      visitorId: "vid_9x28fa",
+      pagePath: "/projects/reactor-temperature-control",
+      isAdmin: false,
+      referrer: "LinkedIn",
+      country: "United States",
+      countryFlag: "🇺🇸",
+      city: "San Jose",
+      deviceType: "Desktop",
+      visitedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      timeAgo: "5m ago",
+    },
+    {
+      id: "v-2",
+      visitorId: "vid_4k18aa",
+      pagePath: "/",
+      isAdmin: false,
+      referrer: "Resume PDF",
+      country: "India",
+      countryFlag: "🇮🇳",
+      city: "Bengaluru",
+      deviceType: "Mobile",
+      visitedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+      timeAgo: "25m ago",
+    },
+    {
+      id: "v-3",
+      visitorId: "vid_admin",
+      pagePath: "/admin/analytics",
+      isAdmin: true,
+      referrer: "Direct",
+      country: "India",
+      countryFlag: "🇮🇳",
+      city: "Udupi",
+      deviceType: "Desktop",
+      visitedAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+      timeAgo: "40m ago",
+    },
+    {
+      id: "v-4",
+      visitorId: "vid_2m88pl",
+      pagePath: "/projects/arduino-hospital-robot",
+      isAdmin: false,
+      referrer: "GitHub",
+      country: "Germany",
+      countryFlag: "🇩🇪",
+      city: "Munich",
+      deviceType: "Desktop",
+      visitedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
+      timeAgo: "1h ago",
+    },
+  ];
+
   return {
     summary: {
       totalUniqueVisitors: Math.round(totalUniqueVisitors * 0.72),
@@ -261,13 +419,17 @@ export function getMockAnalyticsData(days = 30): AnalyticsDashboardData {
     trends,
     topPages,
     visitorSplit,
+    recentVisits,
+    topCountries,
+    topReferrers,
     isDemo: true,
   };
 }
 
 /**
  * Retrieves analytics dashboard metrics, breakdown statistics, and traffic trends.
- * Computes clear separation between "Me" (Admin) and "Others" (Public Visitors).
+ * Computes clear separation between "Me" (Admin) and "Others" (Public Visitors),
+ * plus geographic location, traffic sources (referrers), and live session feed.
  */
 export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDashboardData> {
   try {
@@ -279,7 +441,7 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
 
     const { data: records, error: recordsError } = await supabase
       .from("website_analytics")
-      .select("visitor_id, visited_at, is_admin, page_path")
+      .select("*")
       .gte("visited_at", sinceDate.toISOString())
       .order("visited_at", { ascending: true });
 
@@ -346,6 +508,8 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
     }
 
     const pageCounts = new Map<string, { total: number; public: number; admin: number }>();
+    const countryCounts = new Map<string, number>();
+    const referrerCounts = new Map<string, number>();
 
     for (const r of records) {
       uniqueVisitorsSet.add(r.visitor_id);
@@ -358,6 +522,13 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
       }
       const pageEntry = pageCounts.get(cleanPath)!;
       pageEntry.total++;
+
+      // Track location and referrer
+      const countryCode = r.country || "Unknown";
+      countryCounts.set(countryCode, (countryCounts.get(countryCode) || 0) + 1);
+
+      const refSource = r.referrer || "Direct";
+      referrerCounts.set(refSource, (referrerCounts.get(refSource) || 0) + 1);
 
       const visitedDate = new Date(r.visited_at);
       const dateKey = visitedDate.toISOString().split("T")[0];
@@ -438,7 +609,7 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
     const avgPublicDaily = Math.round((publicVisits / activeDays) * 10) / 10;
     const avgAdminDaily = Math.round((adminVisits / activeDays) * 10) / 10;
 
-    // Build 7-day sparkline arrays
+    // Build 7-day sparklines
     const last7Buckets = Array.from(dailyBuckets.values()).slice(-7);
     const sparklines: MetricSparklines = {
       uniqueVisitors: last7Buckets.map((b) => b.uniqueSet.size),
@@ -482,6 +653,50 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
       }))
       .sort((a, b) => b.views - a.views)
       .slice(0, 8);
+
+    // Calculate top countries
+    const topCountries: CountryStat[] = Array.from(countryCounts.entries())
+      .map(([code, count]) => {
+        const info = getCountryInfo(code);
+        return {
+          country: info.name,
+          code,
+          flag: info.flag,
+          views: count,
+          percentage: totalCount > 0 ? Math.round((count / totalCount) * 100) : 0,
+        };
+      })
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 6);
+
+    // Calculate top referrers
+    const topReferrers: ReferrerStat[] = Array.from(referrerCounts.entries())
+      .map(([source, count]) => ({
+        source,
+        views: count,
+        percentage: totalCount > 0 ? Math.round((count / totalCount) * 100) : 0,
+      }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 6);
+
+    // Build recent visits feed (last 25 records, newest first)
+    const recentRecords = [...records].reverse().slice(0, 25);
+    const recentVisits: RecentVisit[] = recentRecords.map((r) => {
+      const info = getCountryInfo(r.country || "Unknown");
+      return {
+        id: r.id || `v-${Math.random()}`,
+        visitorId: r.visitor_id ? `vid_${r.visitor_id.slice(0, 8)}` : "vid_anon",
+        pagePath: r.page_path || "/",
+        isAdmin: Boolean(r.is_admin),
+        referrer: r.referrer || "Direct",
+        country: info.name,
+        countryFlag: info.flag,
+        city: r.city && r.city !== "Unknown" ? r.city : "Unknown",
+        deviceType: r.device_type || "Desktop",
+        visitedAt: r.visited_at,
+        timeAgo: formatTimeAgo(r.visited_at),
+      };
+    });
 
     // Calculate visitor split (Admin vs Public)
     const adminPct = totalCount > 0 ? Math.round((adminVisits / totalCount) * 100) : 0;
@@ -535,6 +750,9 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
       trends,
       topPages,
       visitorSplit,
+      recentVisits,
+      topCountries,
+      topReferrers,
       isDemo: false,
     };
   } catch (err: any) {

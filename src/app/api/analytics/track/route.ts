@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request payload" }, { status: 400 });
     }
 
-    const { visitor_id, page_path } = body;
+    const { visitor_id, page_path, referrer } = body;
 
     // Validate visitor_id (8 to 64 alphanumeric characters, underscores, hyphens)
     if (!visitor_id || typeof visitor_id !== "string" || !/^[a-zA-Z0-9_-]{8,64}$/.test(visitor_id)) {
@@ -61,28 +61,65 @@ export async function POST(req: Request) {
     // Sanitize path (strip query strings / hash for privacy & grouping)
     const sanitizedPath = page_path.split("?")[0].split("#")[0].slice(0, 150);
 
+    // Sanitize Referrer (LinkedIn, GitHub, Resume, Google, Direct, etc.)
+    const sanitizedReferrer =
+      typeof referrer === "string" && referrer.trim().length > 0
+        ? referrer.trim().slice(0, 60)
+        : "Direct";
+
+    // Extract Location & Device from request headers (Vercel / Cloudflare edge headers)
+    const headers = req.headers;
+    const rawCountry = headers.get("x-vercel-ip-country") || headers.get("cf-ipcountry") || "Unknown";
+    const sanitizedCountry = rawCountry.slice(0, 4).toUpperCase();
+
+    const rawCity = headers.get("x-vercel-ip-city");
+    const sanitizedCity = rawCity ? decodeURIComponent(rawCity).slice(0, 60) : "Unknown";
+
+    const userAgent = headers.get("user-agent") || "";
+    const isMobile = /mobile|android|iphone|ipad|tablet/i.test(userAgent);
+    const deviceType = isMobile ? "Mobile" : "Desktop";
+
     // Determine admin status SECURELY on the server using verified auth session
     const supabase = await createClient();
     const { data: authData } = await supabase.auth.getUser();
     const isAdmin = Boolean(authData?.user?.email);
 
-    // Record the analytics event
+    // Try full insert with location, referrer, and device fields
     const { error: insertError } = await supabase.from("website_analytics").insert({
       visitor_id,
       page_path: sanitizedPath,
       is_admin: isAdmin,
+      referrer: sanitizedReferrer,
+      country: sanitizedCountry,
+      city: sanitizedCity,
+      device_type: deviceType,
       visited_at: new Date().toISOString(),
     });
 
     if (insertError) {
+      // If table doesn't have the new columns yet (code 42703), fallback to basic insert
+      if (insertError.code === "42703" || insertError.message?.includes("column")) {
+        const { error: basicError } = await supabase.from("website_analytics").insert({
+          visitor_id,
+          page_path: sanitizedPath,
+          is_admin: isAdmin,
+          visited_at: new Date().toISOString(),
+        });
+
+        if (!basicError) {
+          return NextResponse.json({ success: true, recorded: true, fallback: true });
+        }
+      }
+
       // Graceful fallback if table does not exist yet (code 42P01 in postgres)
       if (insertError.code === "42P01" || insertError.message?.includes("does not exist")) {
         return NextResponse.json({
           success: true,
           recorded: false,
-          note: "Analytics table pending migration 027",
+          note: "Analytics table pending migration",
         });
       }
+
       console.warn("Analytics insertion warning:", insertError.message);
       return NextResponse.json({ success: false, error: insertError.message }, { status: 500 });
     }

@@ -147,7 +147,36 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     }
   };
 
-  const { summary, trends, topPages = [], visitorSplit, isDemo } = data;
+  const {
+    summary,
+    trends,
+    topPages = [],
+    visitorSplit,
+    recentVisits = [],
+    topCountries = [],
+    topReferrers = [],
+    isDemo,
+  } = data;
+
+  const [feedFilter, setFeedFilter] = useState<"all" | "others" | "me">("all");
+
+  // Filter recent visits based on selected feed filter
+  const filteredVisits = recentVisits.filter((v) => {
+    if (feedFilter === "others") return !v.isAdmin;
+    if (feedFilter === "me") return v.isAdmin;
+    return true;
+  });
+
+  // Helper to get friendly referrer details
+  const getReferrerBadge = (source: string) => {
+    const s = (source || "").toLowerCase();
+    if (s.includes("linkedin")) return { icon: "💼", label: "LinkedIn", color: "#0a66c2", bg: "rgba(10, 102, 194, 0.15)", border: "rgba(10, 102, 194, 0.35)" };
+    if (s.includes("github")) return { icon: "🐙", label: "GitHub", color: "#a855f7", bg: "rgba(168, 85, 247, 0.15)", border: "rgba(168, 85, 247, 0.35)" };
+    if (s.includes("resume") || s.includes("cv")) return { icon: "📄", label: "Resume PDF", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)", border: "rgba(245, 158, 11, 0.35)" };
+    if (s.includes("google") || s.includes("search")) return { icon: "🔍", label: "Search Engine", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)", border: "rgba(16, 185, 129, 0.35)" };
+    if (s.includes("direct")) return { icon: "🔗", label: "Direct Visit", color: "#94a3b8", bg: "rgba(148, 163, 184, 0.12)", border: "rgba(148, 163, 184, 0.25)" };
+    return { icon: "🌐", label: source || "External", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.35)" };
+  };
 
   // Filter trends by selected time range
   const visibleTrends = trends.slice(-timeRange);
@@ -829,6 +858,216 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
               ))
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Traffic Sources & Geographic Origin Row */}
+      <section className={styles.breakdownGrid}>
+        {/* 1. Traffic Sources & Referrers */}
+        <div className={styles.breakdownCard}>
+          <div className={styles.breakdownHeader}>
+            <div>
+              <h3 className={styles.breakdownTitle}>Traffic Sources</h3>
+              <p className={styles.cardSubtitle}>Where visitors found your portfolio</p>
+            </div>
+            <span className={styles.breakdownBadge}>Acquisition</span>
+          </div>
+
+          <div className={styles.sourceListContainer}>
+            {topReferrers.length === 0 ? (
+              <div className={styles.emptyPages}>No referral traffic recorded yet.</div>
+            ) : (
+              topReferrers.map((ref, idx) => {
+                const badge = getReferrerBadge(ref.source);
+                return (
+                  <div key={idx} className={styles.sourceRow}>
+                    <div className={styles.sourceInfoRow}>
+                      <div className={styles.sourceLabelGroup}>
+                        <span className={styles.sourceIcon}>{badge.icon}</span>
+                        <span className={styles.sourceName}>{badge.label}</span>
+                      </div>
+                      <span className={styles.sourceCount}>
+                        <strong>{ref.views.toLocaleString()}</strong> views ({ref.percentage}%)
+                      </span>
+                    </div>
+                    <div className={styles.pageProgressBarTrack}>
+                      <div
+                        className={styles.pageProgressBarFill}
+                        style={{
+                          width: `${Math.max(6, ref.percentage)}%`,
+                          background: badge.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <div className={styles.cardFooterNote}>
+            <span>💡 Tip: Share links with <code>?ref=resume</code> or <code>?ref=linkedin</code> to track exact application sources.</span>
+          </div>
+        </div>
+
+        {/* 2. Geographic Visitor Locations */}
+        <div className={styles.breakdownCard}>
+          <div className={styles.breakdownHeader}>
+            <div>
+              <h3 className={styles.breakdownTitle}>Visitor Geography</h3>
+              <p className={styles.cardSubtitle}>Countries & regions visiting your site</p>
+            </div>
+            <span className={styles.breakdownBadge}>Location</span>
+          </div>
+
+          <div className={styles.sourceListContainer}>
+            {topCountries.length === 0 ? (
+              <div className={styles.emptyPages}>No geographic data recorded yet.</div>
+            ) : (
+              topCountries.map((c, idx) => (
+                <div key={idx} className={styles.sourceRow}>
+                  <div className={styles.sourceInfoRow}>
+                    <div className={styles.sourceLabelGroup}>
+                      <span className={styles.countryFlag}>{c.flag}</span>
+                      <span className={styles.countryName}>{c.country}</span>
+                      <span className={styles.countryCodeBadge}>{c.code}</span>
+                    </div>
+                    <span className={styles.sourceCount}>
+                      <strong>{c.views.toLocaleString()}</strong> views ({c.percentage}%)
+                    </span>
+                  </div>
+                  <div className={styles.pageProgressBarTrack}>
+                    <div
+                      className={styles.pageProgressBarFill}
+                      style={{
+                        width: `${Math.max(6, c.percentage)}%`,
+                        background: "linear-gradient(90deg, #10b981, #38bdf8)",
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className={styles.cardFooterNote}>
+            <span>🌐 Resolved at the edge via server IP geolocation headers (zero personal IP storage).</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Visitor Activity Feed */}
+      <section className={styles.feedCard}>
+        <div className={styles.feedHeader}>
+          <div className={styles.feedTitleBlock}>
+            <div className={styles.feedTitleRow}>
+              <h3 className={styles.feedTitle}>Live Visitor Activity Feed</h3>
+              <span className={styles.feedLiveBadge}>
+                <span className={styles.liveDot} />
+                Recent Sessions
+              </span>
+            </div>
+            <p className={styles.cardSubtitle}>
+              Stream of the latest 25 visits showing who browsed, where they came from, and which pages they viewed.
+            </p>
+          </div>
+
+          <div className={styles.feedFilterTabs} role="tablist">
+            <button
+              type="button"
+              className={`${styles.feedFilterTab} ${feedFilter === "all" ? styles.feedFilterTabActive : ""}`}
+              onClick={() => setFeedFilter("all")}
+            >
+              All ({recentVisits.length})
+            </button>
+            <button
+              type="button"
+              className={`${styles.feedFilterTab} ${feedFilter === "others" ? styles.feedFilterTabActive : ""}`}
+              onClick={() => setFeedFilter("others")}
+            >
+              🌐 Guests Only ({recentVisits.filter((v) => !v.isAdmin).length})
+            </button>
+            <button
+              type="button"
+              className={`${styles.feedFilterTab} ${feedFilter === "me" ? styles.feedFilterTabActive : ""}`}
+              onClick={() => setFeedFilter("me")}
+            >
+              🛡️ Admin Only ({recentVisits.filter((v) => v.isAdmin).length})
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.feedTableWrapper}>
+          {filteredVisits.length === 0 ? (
+            <div className={styles.emptyFeed}>
+              <span className={styles.emptyIcon}>📡</span>
+              <p>No visitor activity matches this filter yet.</p>
+            </div>
+          ) : (
+            <div className={styles.feedList}>
+              {filteredVisits.map((visit) => {
+                const refBadge = getReferrerBadge(visit.referrer);
+                return (
+                  <div
+                    key={visit.id}
+                    className={`${styles.feedItem} ${visit.isAdmin ? styles.feedItemAdmin : styles.feedItemPublic}`}
+                  >
+                    <div className={styles.feedLeftCol}>
+                      {/* Audience badge */}
+                      {visit.isAdmin ? (
+                        <span className={styles.badgeAdmin}>
+                          <span>🛡️</span> Me (Admin)
+                        </span>
+                      ) : (
+                        <span className={styles.badgePublic}>
+                          <span>🌐</span> Guest / Recruiter
+                        </span>
+                      )}
+
+                      {/* Location: Flag + City, Country */}
+                      <div className={styles.feedLocation}>
+                        <span className={styles.feedFlag}>{visit.countryFlag}</span>
+                        <span className={styles.feedLocationText}>
+                          {visit.city && visit.city !== "Unknown" ? `${visit.city}, ` : ""}
+                          {visit.country}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.feedMidCol}>
+                      {/* Traffic Source */}
+                      <span
+                        className={styles.feedSourceBadge}
+                        style={{
+                          backgroundColor: refBadge.bg,
+                          borderColor: refBadge.border,
+                          color: refBadge.color,
+                        }}
+                      >
+                        <span>{refBadge.icon}</span>
+                        <span>{refBadge.label}</span>
+                      </span>
+
+                      {/* Route Path */}
+                      <span className={styles.feedPathBadge} title={visit.pagePath}>
+                        {visit.pagePath === "/" ? "Home (/)" : visit.pagePath}
+                      </span>
+                    </div>
+
+                    <div className={styles.feedRightCol}>
+                      {/* Device */}
+                      <span className={styles.feedDeviceBadge}>
+                        {visit.deviceType.toLowerCase().includes("mobile") ? "📱 Mobile" : "💻 Desktop"}
+                      </span>
+
+                      {/* Time */}
+                      <span className={styles.feedTime} title={new Date(visit.visitedAt).toLocaleString()}>
+                        {visit.timeAgo}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </div>
