@@ -1385,6 +1385,69 @@
   color: var(--text-secondary, #64748b);
 }
 
+.tzPill {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin: 0 2px;
+  letter-spacing: 0.04em;
+}
+
+.locationCountryTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+}
+
+.flagEmoji {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.countryNameBold {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.cityNameSub {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.locationPillMuted {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.locationPillLocal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
 /* Mobile Adjustments */
 @media (max-width: 640px) {
   .container {

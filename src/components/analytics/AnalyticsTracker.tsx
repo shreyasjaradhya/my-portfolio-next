@@ -94,7 +94,7 @@ function getTrafficSource(): string {
 }
 
 /**
- * Manually tracks a custom event or modal view (e.g. Project Full Report opened, PDF downloaded).
+ * Manually tracks a custom event or modal view (e.g. Project Full Report opened, PDF downloaded, Section viewed).
  */
 export function trackAnalyticsEvent(path: string, customReferrer?: string) {
   if (typeof window === "undefined") return;
@@ -103,11 +103,13 @@ export function trackAnalyticsEvent(path: string, customReferrer?: string) {
     if (!visitorId) return;
 
     const referrer = customReferrer || getTrafficSource();
+    const timeZone = Intl.DateTimeFormat?.().resolvedOptions?.().timeZone || "";
 
     const payload = JSON.stringify({
       visitor_id: visitorId,
       page_path: path,
       referrer,
+      client_timezone: timeZone,
     });
 
     if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
@@ -131,23 +133,28 @@ export default function AnalyticsTracker() {
   useEffect(() => {
     if (!pathname) return;
 
+    const currentHash = typeof window !== "undefined" ? window.location.hash : "";
+    const targetPath = currentHash && pathname === "/" ? `/#${currentHash.replace(/^#/, "")}` : pathname;
+
     const now = Date.now();
     // Guard against React StrictMode duplicate execution (within 1.2s on same path)
-    if (lastTrackedRef.current.path === pathname && now - lastTrackedRef.current.time < 1200) {
+    if (lastTrackedRef.current.path === targetPath && now - lastTrackedRef.current.time < 1200) {
       return;
     }
 
-    lastTrackedRef.current = { path: pathname, time: now };
+    lastTrackedRef.current = { path: targetPath, time: now };
 
     const visitorId = getOrCreateVisitorId();
     if (!visitorId) return;
 
     const referrer = getTrafficSource();
+    const timeZone = Intl.DateTimeFormat?.().resolvedOptions?.().timeZone || "";
 
     const payload = JSON.stringify({
       visitor_id: visitorId,
-      page_path: pathname,
+      page_path: targetPath,
       referrer,
+      client_timezone: timeZone,
     });
 
     // Send tracking beacon asynchronously
@@ -163,10 +170,25 @@ export default function AnalyticsTracker() {
       headers: { "Content-Type": "application/json" },
       body: payload,
       keepalive: true,
-    }).catch(() => {
-      // Non-blocking fail-safe: ignore network errors so user experience is never impacted
-    });
+    }).catch(() => {});
   }, [pathname]);
+
+  // Listen to in-page hash transitions (e.g. #projects, #skills, #experience, #contact)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const cleanHash = hash.replace(/^#/, "");
+      if (["home", "about", "skills", "projects", "experience", "contact"].includes(cleanHash)) {
+        trackAnalyticsEvent(`/#${cleanHash}`);
+      }
+    };
+
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, []);
 
   return null;
 }

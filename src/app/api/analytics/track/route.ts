@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request payload" }, { status: 400 });
     }
 
-    const { visitor_id, page_path, referrer } = body;
+    const { visitor_id, page_path, referrer, client_timezone } = body;
 
     // Validate visitor_id (8 to 64 alphanumeric characters, underscores, hyphens)
     if (!visitor_id || typeof visitor_id !== "string" || !/^[a-zA-Z0-9_-]{8,64}$/.test(visitor_id)) {
@@ -58,8 +58,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Too many tracking events" }, { status: 429 });
     }
 
-    // Sanitize path (strip query strings / hash for privacy & grouping)
-    const sanitizedPath = page_path.split("?")[0].split("#")[0].slice(0, 150);
+    // Sanitize path (strip query strings, BUT PRESERVE section hash / action labels like /#projects, /#skills, [Full Report Modal])
+    const sanitizedPath = page_path.split("?")[0].trim().slice(0, 150);
 
     // Sanitize Referrer (LinkedIn, GitHub, Resume, Google, Direct, etc.)
     const sanitizedReferrer =
@@ -69,11 +69,41 @@ export async function POST(req: Request) {
 
     // Extract Location & Device from request headers (Vercel / Cloudflare edge headers)
     const headers = req.headers;
-    const rawCountry = headers.get("x-vercel-ip-country") || headers.get("cf-ipcountry") || "Unknown";
-    const sanitizedCountry = rawCountry.slice(0, 4).toUpperCase();
+    let rawCountry = headers.get("x-vercel-ip-country") || headers.get("cf-ipcountry") || "Unknown";
+    let rawCity = headers.get("x-vercel-ip-city");
+    let sanitizedCity = rawCity ? decodeURIComponent(rawCity).slice(0, 60) : "Unknown";
 
-    const rawCity = headers.get("x-vercel-ip-city");
-    const sanitizedCity = rawCity ? decodeURIComponent(rawCity).slice(0, 60) : "Unknown";
+    // If edge headers did not detect country (e.g. preview, proxy, local), infer from client timezone
+    if ((rawCountry === "Unknown" || !rawCountry) && client_timezone && typeof client_timezone === "string") {
+      const tz = client_timezone.toLowerCase();
+      if (tz.includes("kolkata") || tz.includes("calcutta") || tz.includes("india")) {
+        rawCountry = "IN";
+        if (sanitizedCity === "Unknown") sanitizedCity = "Bengaluru (IST)";
+      } else if (tz.includes("new_york") || tz.includes("chicago") || tz.includes("los_angeles") || tz.includes("denver")) {
+        rawCountry = "US";
+        if (sanitizedCity === "Unknown") sanitizedCity = "United States";
+      } else if (tz.includes("london")) {
+        rawCountry = "GB";
+        if (sanitizedCity === "Unknown") sanitizedCity = "London";
+      } else if (tz.includes("berlin") || tz.includes("frankfurt")) {
+        rawCountry = "DE";
+        if (sanitizedCity === "Unknown") sanitizedCity = "Germany";
+      } else if (tz.includes("singapore")) {
+        rawCountry = "SG";
+        if (sanitizedCity === "Unknown") sanitizedCity = "Singapore";
+      }
+    }
+
+    // Check for local loopback
+    const forwardedFor = headers.get("x-forwarded-for") || "";
+    if (forwardedFor.includes("127.0.0.1") || forwardedFor.includes("::1")) {
+      if (rawCountry === "Unknown") {
+        rawCountry = "LOCAL";
+        sanitizedCity = "Localhost Dev";
+      }
+    }
+
+    const sanitizedCountry = rawCountry.slice(0, 5).toUpperCase();
 
     const userAgent = headers.get("user-agent") || "";
     const isMobile = /mobile|android|iphone|ipad|tablet/i.test(userAgent);

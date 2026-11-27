@@ -101,17 +101,31 @@ export interface AnalyticsDashboardData {
  * Maps ISO 2-letter country codes to national flag emoji and friendly name.
  */
 export function getCountryInfo(code: string): { name: string; flag: string } {
-  if (!code || code === "Unknown" || code.length !== 2) {
-    return { name: "Direct / Unknown", flag: "🌐" };
+  if (!code || code === "Unknown" || code === "DIRECT / UNKNOWN" || code.includes("DIRECT")) {
+    return { name: "Location Not Detected", flag: "🌐" };
   }
-  const upper = code.toUpperCase();
-  // Compute flag emoji from code point
-  let flag = "🌐";
-  try {
-    flag = String.fromCodePoint(...[...upper].map((c) => 127397 + c.charCodeAt(0)));
-  } catch {
-    flag = "🌐";
+  if (code.toUpperCase() === "LOCAL") {
+    return { name: "Local Development", flag: "💻" };
   }
+  const upper = code.trim().toUpperCase().slice(0, 2);
+
+  const flags: Record<string, string> = {
+    IN: "🇮🇳",
+    US: "🇺🇸",
+    GB: "🇬🇧",
+    DE: "🇩🇪",
+    CA: "🇨🇦",
+    AU: "🇦🇺",
+    SG: "🇸🇬",
+    AE: "🇦🇪",
+    FR: "🇫🇷",
+    NL: "🇳🇱",
+    JP: "🇯🇵",
+    BR: "🇧🇷",
+    IE: "🇮🇪",
+    SE: "🇸🇪",
+    CH: "🇨🇭",
+  };
 
   const names: Record<string, string> = {
     IN: "India",
@@ -131,7 +145,9 @@ export function getCountryInfo(code: string): { name: string; flag: string } {
     CH: "Switzerland",
   };
 
-  return { name: names[upper] || upper, flag };
+  const flag = flags[upper] || "🌐";
+  const name = names[upper] || upper;
+  return { name, flag };
 }
 
 /**
@@ -732,6 +748,10 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
     const recentVisits: RecentVisit[] = recentRecords.map((r) => {
       const info = getCountryInfo(r.country || "Unknown");
       const dt = formatExactDateTime(r.visited_at);
+      const cleanCity =
+        r.city && r.city !== "Unknown" && !r.city.includes("Direct") && !r.city.includes("Unknown")
+          ? r.city
+          : "";
       return {
         id: r.id || `v-${Math.random()}`,
         visitorId: r.visitor_id ? `vid_${r.visitor_id.slice(0, 8)}` : "vid_anon",
@@ -740,7 +760,7 @@ export async function getAnalyticsDashboardData(days = 30): Promise<AnalyticsDas
         referrer: r.referrer || "Direct",
         country: info.name,
         countryFlag: info.flag,
-        city: r.city && r.city !== "Unknown" ? r.city : "Unknown",
+        city: cleanCity,
         deviceType: r.device_type || "Desktop",
         visitedAt: r.visited_at,
         timeAgo: formatTimeAgo(r.visited_at),

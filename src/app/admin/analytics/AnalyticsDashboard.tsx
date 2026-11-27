@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,7 +16,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
-import type { AnalyticsDashboardData } from "@/lib/supabase/analytics";
+import type { AnalyticsDashboardData, RecentVisit } from "@/lib/supabase/analytics";
 import styles from "./analytics.module.css";
 
 // Register Chart.js components
@@ -125,6 +125,83 @@ function Sparkline({
   );
 }
 
+/**
+ * Formats visited_at into visitor's actual browser/device local time (e.g. 07:14 AM IST • Nov 27, 2026),
+ * recalculating relative time ("Just now", "25m ago", etc.) dynamically in the client.
+ */
+function FormattedTimestamp({
+  isoString,
+  fallbackTimeAgo,
+}: {
+  isoString: string;
+  fallbackTimeAgo: string;
+}) {
+  const [clientTime, setClientTime] = useState<{
+    time: string;
+    date: string;
+    tz: string;
+    relative: string;
+  } | null>(null);
+
+  useEffect(() => {
+    try {
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return;
+
+      const time = d.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      const date = d.toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      let tz = "";
+      try {
+        const parts = new Intl.DateTimeFormat([], { timeZoneName: "short" }).formatToParts(d);
+        tz = parts.find((p) => p.type === "timeZoneName")?.value || "";
+      } catch {}
+
+      const diffSec = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+      let relative = fallbackTimeAgo;
+      if (diffSec < 60) relative = "Just now";
+      else if (diffSec < 3600) relative = `${Math.floor(diffSec / 60)}m ago`;
+      else if (diffSec < 86400) relative = `${Math.floor(diffSec / 3600)}h ago`;
+      else if (diffSec < 172800) relative = "Yesterday";
+      else relative = `${Math.floor(diffSec / 86400)}d ago`;
+
+      setClientTime({ time, date, tz, relative });
+    } catch {}
+  }, [isoString, fallbackTimeAgo]);
+
+  if (!clientTime) {
+    return (
+      <div className={styles.feedExactTimeBlock}>
+        <div className={styles.exactTimeLine}>
+          <span className={styles.clockIcon}>🕒</span>
+          <span className={styles.exactTimeText}>{fallbackTimeAgo}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.feedExactTimeBlock}>
+      <div className={styles.exactTimeLine}>
+        <span className={styles.clockIcon}>🕒</span>
+        <span className={styles.exactTimeText}>
+          {clientTime.time} {clientTime.tz ? <span className={styles.tzPill}>{clientTime.tz}</span> : null} • {clientTime.date}
+        </span>
+      </div>
+      <span className={styles.relativeTimeText}>{clientTime.relative}</span>
+    </div>
+  );
+}
+
 export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
   const [data, setData] = useState<AnalyticsDashboardData>(initialData);
   const [segment, setSegment] = useState<AudienceSegment>("others");
@@ -178,30 +255,83 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     return { icon: "🌐", label: source || "External", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.15)", border: "rgba(56, 189, 248, 0.35)" };
   };
 
-  // Helper to resolve exact project and report titles from paths
+  // Helper to resolve exact project, section, and report titles from paths
   const getProjectOrPageDetails = (path: string) => {
     const raw = (path || "").trim();
     const p = raw.toLowerCase();
 
+    // Check action flags
     const isReportModal = p.includes("[full report modal]") || p.includes("[report modal]") || p.includes("#report");
     const isReportDownload = p.includes("[download") || p.includes("[print");
 
-    if (p === "/" || p === "") {
+    // Section browsing on Homepage
+    if (p === "/#projects" || p === "#projects") {
       return {
-        title: "Portfolio Landing",
-        type: "Homepage",
-        badge: "Overview",
+        title: "Projects Showcase Section",
+        type: "Section Viewed",
+        badge: "📁 Projects",
+        badgeColor: "#38bdf8",
+        icon: "📁",
+        cleanPath: "/#projects",
+      };
+    }
+    if (p === "/#skills" || p === "#skills") {
+      return {
+        title: "Skills & Technical Stack Section",
+        type: "Section Viewed",
+        badge: "⚡ Skills",
+        badgeColor: "#38bdf8",
+        icon: "⚡",
+        cleanPath: "/#skills",
+      };
+    }
+    if (p === "/#experience" || p === "#experience") {
+      return {
+        title: "Work Experience & Career Timeline",
+        type: "Section Viewed",
+        badge: "💼 Experience",
+        badgeColor: "#38bdf8",
+        icon: "💼",
+        cleanPath: "/#experience",
+      };
+    }
+    if (p === "/#about" || p === "#about") {
+      return {
+        title: "About Shreyas Section",
+        type: "Section Viewed",
+        badge: "👤 About",
+        badgeColor: "#38bdf8",
+        icon: "👤",
+        cleanPath: "/#about",
+      };
+    }
+    if (p === "/#contact" || p === "#contact") {
+      return {
+        title: "Contact & Recruiter Inquiry Form",
+        type: "Section Viewed",
+        badge: "✉️ Contact",
+        badgeColor: "#38bdf8",
+        icon: "✉️",
+        cleanPath: "/#contact",
+      };
+    }
+    if (p === "/" || p === "" || p === "/#home" || p === "#home") {
+      return {
+        title: "Portfolio Landing Overview",
+        type: "Homepage View",
+        badge: "🏠 Hero & Bio",
         badgeColor: "#38bdf8",
         icon: "🏠",
         cleanPath: "/",
       };
     }
 
+    // Projects deep-dives & reports
     if (p.includes("reactor-temperature-control")) {
       return {
         title: "Reactor Temperature Control System",
-        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
-        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "🔬 Project",
+        type: isReportModal ? "Read Full Engineering Report" : isReportDownload ? "Downloaded Project PDF" : "Explored Project",
+        badge: isReportModal ? "📄 Report Opened" : isReportDownload ? "📥 PDF Saved" : "🔬 Project",
         badgeColor: isReportModal ? "#10b981" : "#38bdf8",
         icon: "🔬",
         cleanPath: "/projects/reactor-temperature-control",
@@ -211,8 +341,8 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     if (p.includes("arduino-hospital-robot") || p.includes("hospital-robot")) {
       return {
         title: "Arduino Hospital Robot",
-        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
-        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "🤖 Project",
+        type: isReportModal ? "Read Full Engineering Report" : isReportDownload ? "Downloaded Project PDF" : "Explored Project",
+        badge: isReportModal ? "📄 Report Opened" : isReportDownload ? "📥 PDF Saved" : "🤖 Project",
         badgeColor: isReportModal ? "#10b981" : "#38bdf8",
         icon: "🤖",
         cleanPath: "/projects/arduino-hospital-robot",
@@ -222,8 +352,8 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     if (p.includes("frequency-selective")) {
       return {
         title: "Frequency-Selective Circuit",
-        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
-        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "📻 Project",
+        type: isReportModal ? "Read Analog Filter Report" : isReportDownload ? "Downloaded Project PDF" : "Explored Project",
+        badge: isReportModal ? "📄 Report Opened" : isReportDownload ? "📥 PDF Saved" : "📻 Project",
         badgeColor: isReportModal ? "#10b981" : "#38bdf8",
         icon: "📻",
         cleanPath: "/projects/frequency-selective-circuit",
@@ -233,8 +363,8 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
     if (p.includes("fifo-buffer")) {
       return {
         title: "FIFO Buffer Design & SystemVerilog",
-        type: isReportModal ? "Full Report Read" : isReportDownload ? "Report Downloaded" : "Project Showcase",
-        badge: isReportModal ? "📄 Report Read" : isReportDownload ? "📥 PDF Saved" : "💾 Project",
+        type: isReportModal ? "Read Verification Report" : isReportDownload ? "Downloaded Project PDF" : "Explored Project",
+        badge: isReportModal ? "📄 Report Opened" : isReportDownload ? "📥 PDF Saved" : "💾 Project",
         badgeColor: isReportModal ? "#10b981" : "#38bdf8",
         icon: "💾",
         cleanPath: "/projects/fifo-buffer",
@@ -249,18 +379,19 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
         .join(" ");
       return {
         title: cleanTitle || "Project Details",
-        type: isReportModal ? "Full Report Read" : "Project Page",
-        badge: isReportModal ? "📄 Report Read" : "📁 Project",
+        type: isReportModal ? "Read Full Report" : "Viewed Project",
+        badge: isReportModal ? "📄 Report Opened" : "📁 Project",
         badgeColor: isReportModal ? "#10b981" : "#818cf8",
         icon: "📁",
         cleanPath: `/projects/${slug}`,
       };
     }
 
+    // Admin pages
     if (p.startsWith("/admin/analytics")) {
       return {
-        title: "Website Traffic Analytics",
-        type: "Admin Dashboard",
+        title: "Website Traffic Analytics Dashboard",
+        type: "Admin Analytics",
         badge: "📊 Analytics",
         badgeColor: "#a855f7",
         icon: "📊",
@@ -270,9 +401,9 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
 
     if (p.startsWith("/admin/messages")) {
       return {
-        title: "Recruiter Messages Inbox",
+        title: "Contact Messages & Inquiries Inbox",
         type: "Admin Messages",
-        badge: "📬 Inbox",
+        badge: "📬 Messages",
         badgeColor: "#a855f7",
         icon: "📬",
         cleanPath: "/admin/messages",
@@ -281,23 +412,34 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
 
     if (p.startsWith("/admin/guide")) {
       return {
-        title: "Portfolio AI Guide",
-        type: "AI Assistant",
-        badge: "💡 AI Guide",
+        title: "Guide AI Assistant Settings",
+        type: "AI Management",
+        badge: "💡 Guide AI",
         badgeColor: "#a855f7",
         icon: "💡",
         cleanPath: "/admin/guide",
       };
     }
 
+    if (p.startsWith("/admin/projects")) {
+      return {
+        title: "Project Management Editor",
+        type: "Admin Editor",
+        badge: "🛠️ Projects CMS",
+        badgeColor: "#a855f7",
+        icon: "🛠️",
+        cleanPath: "/admin/projects",
+      };
+    }
+
     if (p.startsWith("/admin")) {
       return {
-        title: "Portfolio Admin Portal",
+        title: "Portfolio Admin Control Center",
         type: "Admin Session",
-        badge: "🛡️ Admin",
+        badge: "🛡️ Admin Portal",
         badgeColor: "#a855f7",
         icon: "⚙️",
-        cleanPath: raw,
+        cleanPath: "/admin",
       };
     }
 
@@ -309,6 +451,55 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
       icon: "🌐",
       cleanPath: raw,
     };
+  };
+
+  // Helper to render clean, professional location pills (avoids raw text or missing flag issues)
+  const renderLocationBadge = (visit: RecentVisit) => {
+    const isUnknown =
+      !visit.country ||
+      visit.country === "Location Not Detected" ||
+      visit.country === "Direct / Unknown" ||
+      visit.country.includes("Direct") ||
+      visit.country === "Unknown";
+
+    if (isUnknown) {
+      return (
+        <div className={styles.feedLocation}>
+          <span className={styles.locationPillMuted}>
+            <span>🌐</span> Location not detected
+          </span>
+        </div>
+      );
+    }
+
+    const isLocal = visit.country === "Local Development" || visit.country === "LOCAL";
+    if (isLocal) {
+      return (
+        <div className={styles.feedLocation}>
+          <span className={styles.locationPillLocal}>
+            <span>💻</span> Localhost Dev Session
+          </span>
+        </div>
+      );
+    }
+
+    const cleanCity =
+      visit.city &&
+      visit.city !== "Unknown" &&
+      !visit.city.includes("Direct") &&
+      !visit.city.includes("Unknown")
+        ? visit.city
+        : "";
+
+    return (
+      <div className={styles.feedLocation}>
+        <span className={styles.locationCountryTag}>
+          <span className={styles.flagEmoji}>{visit.countryFlag || "🌐"}</span>
+          <span className={styles.countryNameBold}>{visit.country}</span>
+        </span>
+        {cleanCity ? <span className={styles.cityNameSub}>• {cleanCity}</span> : null}
+      </div>
+    );
   };
 
   // Filter trends by selected time range
@@ -962,33 +1153,37 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
             {topPages.length === 0 ? (
               <div className={styles.emptyPages}>No page views recorded yet.</div>
             ) : (
-              topPages.map((page, idx) => (
-                <div key={idx} className={styles.pageRow}>
-                  <div className={styles.pageInfoRow}>
-                    <span className={styles.pagePath} title={page.path}>
-                      {page.path === "/" ? "Home (/) - Portfolio Landing" : page.path}
-                    </span>
-                    <span className={styles.pageCount}>
-                      <strong>{page.views}</strong> views{" "}
-                      <span className={styles.pageCountBreakdown}>
-                        ({page.publicViews} others • {page.adminViews} me)
+              topPages.map((page, idx) => {
+                const pageDetails = getProjectOrPageDetails(page.path);
+                return (
+                  <div key={idx} className={styles.pageRow}>
+                    <div className={styles.pageInfoRow}>
+                      <span className={styles.pagePath} title={page.path}>
+                        <span style={{ marginRight: "6px" }}>{pageDetails.icon}</span>
+                        {pageDetails.title}
                       </span>
-                    </span>
+                      <span className={styles.pageCount}>
+                        <strong>{page.views}</strong> views{" "}
+                        <span className={styles.pageCountBreakdown}>
+                          ({page.publicViews} others • {page.adminViews} me)
+                        </span>
+                      </span>
+                    </div>
+                    <div className={styles.pageProgressBarTrack}>
+                      <div
+                        className={styles.pageProgressBarFill}
+                        style={{
+                          width: `${Math.max(8, page.percentage)}%`,
+                          background:
+                            page.publicViews > page.adminViews
+                              ? "linear-gradient(90deg, #38bdf8, #818cf8)"
+                              : "linear-gradient(90deg, #818cf8, #a855f7)",
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className={styles.pageProgressBarTrack}>
-                    <div
-                      className={styles.pageProgressBarFill}
-                      style={{
-                        width: `${Math.max(8, page.percentage)}%`,
-                        background:
-                          page.publicViews > page.adminViews
-                            ? "linear-gradient(90deg, #38bdf8, #818cf8)"
-                            : "linear-gradient(90deg, #818cf8, #a855f7)",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
@@ -1158,13 +1353,7 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
                           </span>
                         )}
 
-                        <div className={styles.feedLocation}>
-                          <span className={styles.feedFlag}>{visit.countryFlag}</span>
-                          <span className={styles.feedLocationText}>
-                            {visit.city && visit.city !== "Unknown" ? `${visit.city}, ` : ""}
-                            {visit.country}
-                          </span>
-                        </div>
+                        {renderLocationBadge(visit)}
                       </div>
 
                       <div className={styles.feedMetaTags}>
@@ -1208,16 +1397,11 @@ export default function AnalyticsDashboard({ initialData }: AnalyticsDashboardPr
                         </div>
                       </div>
 
-                      {/* Exact Arrival Date & Time */}
-                      <div className={styles.feedExactTimeBlock}>
-                        <div className={styles.exactTimeLine}>
-                          <span className={styles.clockIcon}>🕒</span>
-                          <span className={styles.exactTimeText}>
-                            {visit.exactTime ? `${visit.exactTime} • ${visit.exactDate}` : new Date(visit.visitedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </span>
-                        </div>
-                        <span className={styles.relativeTimeText}>{visit.timeAgo}</span>
-                      </div>
+                      {/* Exact Arrival Date & Time formatted dynamically in visitor's local system timezone */}
+                      <FormattedTimestamp
+                        isoString={visit.visitedAt}
+                        fallbackTimeAgo={visit.timeAgo}
+                      />
                     </div>
                   </div>
                 );

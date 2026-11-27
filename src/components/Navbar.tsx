@@ -13,6 +13,7 @@ import SwarmRebuild from "./SwarmRebuild";
 import { GitHubIcon, LinkedInIcon } from "./SocialIcons";
 import { getSocialLinks } from "@/lib/social";
 import type { Profile } from "@/lib/supabase/types";
+import { trackAnalyticsEvent } from "./analytics/AnalyticsTracker";
 
 const SECTION_IDS = [
   "home",
@@ -98,6 +99,10 @@ export default function Navbar({ profile }: { profile: Profile | null }) {
   const handleNavChange = useCallback((index: number) => {
     setActiveSectionIndex(index);
     isNavigatingRef.current = true;
+    const section = SECTION_IDS[index];
+    if (section) {
+      trackAnalyticsEvent(`/#${section}`);
+    }
     setTimeout(() => {
       isNavigatingRef.current = false;
     }, 850);
