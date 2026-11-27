@@ -15,10 +15,12 @@ export default function Contact({ profile }: { profile: Profile | null }) {
     email: "",
     subject: "",
     message: "",
+    hp_company: "", // Anti-bot honeypot
   });
 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [lastSubmittedAt, setLastSubmittedAt] = useState(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -41,6 +43,21 @@ export default function Contact({ profile }: { profile: Profile | null }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1. Silent honeypot check: If bot filled the hidden field, pretend success without writing to DB
+    if (formData.hp_company && formData.hp_company.trim().length > 0) {
+      setStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "", hp_company: "" });
+      return;
+    }
+
+    // 2. Client-side throttle: enforce minimum 15 seconds between submissions
+    const now = Date.now();
+    if (now - lastSubmittedAt < 15000) {
+      setErrorMessage("Please wait a moment before sending another message.");
+      setStatus("error");
+      return;
+    }
     
     const validationError = validateForm();
     if (validationError) {
@@ -65,8 +82,9 @@ export default function Contact({ profile }: { profile: Profile | null }) {
 
       if (error) throw new Error(error.message);
 
+      setLastSubmittedAt(Date.now());
       setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", subject: "", message: "", hp_company: "" });
     } catch (err: any) {
       console.error("Submission error:", err);
       setErrorMessage("Failed to send message. Please try again later.");
@@ -124,6 +142,20 @@ export default function Contact({ profile }: { profile: Profile | null }) {
           )}
 
           <form onSubmit={handleSubmit} className={styles.form}>
+            {/* Anti-bot honeypot field - visually hidden from human users */}
+            <div style={{ display: "none", position: "absolute", left: "-9999px" }} aria-hidden="true">
+              <label htmlFor="hp_company">Company Website</label>
+              <input
+                type="text"
+                id="hp_company"
+                name="hp_company"
+                tabIndex={-1}
+                autoComplete="off"
+                value={formData.hp_company}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className={styles.formGroup}>
               <label htmlFor="name" className={styles.label}>Name *</label>
               <input

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "@/lib/supabase/adminAuth";
 import type { TestimonialStatus } from "@/lib/supabase/types";
 
 // Helper to securely verify the caller is the authenticated system admin
@@ -12,7 +13,7 @@ async function assertAdmin() {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) {
+  if (authError || !user || !user.email || !isAdminEmail(user.email)) {
     throw new Error("Unauthorized: Only an authenticated administrator can perform this action.");
   }
 

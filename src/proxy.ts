@@ -1,9 +1,16 @@
 /* eslint-disable */
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isAdminEmail } from '@/lib/supabase/adminAuth'
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // 1. Strip any client-supplied x-admin-* headers to prevent spoofing
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.delete('x-admin-verified')
+  requestHeaders.delete('x-user-id')
+  requestHeaders.delete('x-user-email')
 
   // Check for presence of Supabase authentication cookies
   const allCookies = request.cookies.getAll()
@@ -16,7 +23,11 @@ export async function proxy(request: NextRequest) {
 
   // Fast-path 1: Public non-admin routes without auth cookies don't need blocking auth network calls
   if (!isAdminRoute && !hasAuthCookie) {
-    return NextResponse.next({ request })
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   // Fast-path 2: Unauthenticated user trying to access protected /admin route without cookies
@@ -27,7 +38,9 @@ export async function proxy(request: NextRequest) {
 
   // Supabase SSR Client for session refresh and verification
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: requestHeaders,
+    },
   })
 
   const cookiesToSetList: { name: string; value: string; options: any }[] = []
@@ -53,9 +66,9 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user }, error } = await supabase.auth.getUser()
 
-  // Handle /admin/login when already authenticated
+  // Handle /admin/login when already authenticated as admin
   if (isLoginPage) {
-    if (user && !error) {
+    if (user && !error && isAdminEmail(user.email)) {
       const adminUrl = new URL('/admin', request.url)
       const redirectResponse = NextResponse.redirect(adminUrl)
       cookiesToSetList.forEach(({ name, value, options }) =>
@@ -68,7 +81,8 @@ export async function proxy(request: NextRequest) {
 
   // Handle protected /admin/* routes
   if (isAdminRoute) {
-    if (error || !user) {
+    // If auth error, missing user, or not authorized admin email, redirect to login
+    if (error || !user || !isAdminEmail(user.email)) {
       const loginUrl = new URL('/admin/login', request.url)
       const redirectResponse = NextResponse.redirect(loginUrl)
       cookiesToSetList.forEach(({ name, value, options }) =>
@@ -76,24 +90,6 @@ export async function proxy(request: NextRequest) {
       )
       return redirectResponse
     }
-
-    // Forward verified user headers to Server Components to avoid duplicate auth round-trips
-    const requestHeaders = new Headers(request.headers)
-    requestHeaders.set('x-admin-verified', 'true')
-    requestHeaders.set('x-user-id', user.id)
-    requestHeaders.set('x-user-email', user.email || '')
-
-    const forwardedResponse = NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    })
-
-    cookiesToSetList.forEach(({ name, value, options }) =>
-      forwardedResponse.cookies.set(name, value, options)
-    )
-
-    return forwardedResponse
   }
 
   return supabaseResponse

@@ -109,10 +109,11 @@ export async function POST(req: Request) {
     const isMobile = /mobile|android|iphone|ipad|tablet/i.test(userAgent);
     const deviceType = isMobile ? "Mobile" : "Desktop";
 
-    // Determine admin status SECURELY on the server using verified auth session
+    // Determine admin status SECURELY on the server using verified auth session & admin email check
     const supabase = await createClient();
     const { data: authData } = await supabase.auth.getUser();
-    const isAdmin = Boolean(authData?.user?.email);
+    const adminEmail = (process.env.ADMIN_EMAIL || "shreyasjaradhya@gmail.com").toLowerCase();
+    const isAdmin = Boolean(authData?.user?.email && authData.user.email.toLowerCase() === adminEmail);
 
     // Try full insert with location, referrer, and device fields
     const { error: insertError } = await supabase.from("website_analytics").insert({

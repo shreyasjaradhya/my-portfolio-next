@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "./server";
 
@@ -7,29 +6,27 @@ export interface AdminUser {
   email: string;
 }
 
+export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "shreyasjaradhya@gmail.com").toLowerCase();
+
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return email.trim().toLowerCase() === ADMIN_EMAIL;
+}
+
 /**
- * Fast-path admin authentication check for Server Components.
- * Reads verified headers passed from proxy.ts (0ms latency, zero network calls).
- * Falls back to secure Supabase server client if headers are missing.
+ * Robust server-side admin authentication check for Server Components.
+ * Strictly verifies the authenticated session via Supabase server client
+ * and enforces that the caller's email matches the authorized administrator.
+ * Redirects to /admin/login if unauthenticated or unauthorized.
  */
 export async function requireAdminAuth(): Promise<AdminUser> {
-  const headersList = await headers();
-  const isVerified = headersList.get("x-admin-verified");
-  const userId = headersList.get("x-user-id");
-  const userEmail = headersList.get("x-user-email");
-
-  if (isVerified === "true" && userId && userEmail) {
-    return {
-      id: userId,
-      email: userEmail,
-    };
-  }
-
-  // Fallback: verify directly with Supabase server client
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  if (error || !user || !user.email) {
+  if (error || !user || !user.email || !isAdminEmail(user.email)) {
     redirect("/admin/login");
   }
 

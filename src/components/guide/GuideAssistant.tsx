@@ -267,11 +267,23 @@ export default function GuideAssistant() {
       }
       const linkMatch = part.match(/\[(.*?)\]\((.*?)\)/);
       if (linkMatch) {
-        return (
-          <a key={i} href={linkMatch[2]} target="_blank" rel="noopener noreferrer">
-            {linkMatch[1]}
-          </a>
-        );
+        const rawUrl = linkMatch[2].trim();
+        // Whitelist safe URL schemes to prevent XSS (e.g. javascript: URIs)
+        const isSafeUrl =
+          rawUrl.startsWith("https://") ||
+          rawUrl.startsWith("http://") ||
+          rawUrl.startsWith("mailto:") ||
+          rawUrl.startsWith("#") ||
+          rawUrl.startsWith("/");
+
+        if (isSafeUrl) {
+          return (
+            <a key={i} href={rawUrl} target="_blank" rel="noopener noreferrer">
+              {linkMatch[1]}
+            </a>
+          );
+        }
+        return <span key={i}>{linkMatch[1]}</span>;
       }
       return part;
     });
