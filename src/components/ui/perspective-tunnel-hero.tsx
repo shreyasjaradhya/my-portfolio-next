@@ -119,8 +119,6 @@ function TunnelCard({
   total: number;
   stage: StageDimensions;
 }) {
-  const [imageError, setImageError] = useState(false);
-
   // Sequential progression: Each photo opens from the 1st card to the last card
   const startWindow = (card.index / total) * 0.45;
   const endWindow = startWindow + 0.55;
@@ -167,19 +165,15 @@ function TunnelCard({
       className={styles.tunnelCardWrapper}
     >
       <Link href="#projects" className={styles.tunnelCard} aria-label={`View project for ${card.item.title}`}>
-        {!imageError ? (
-          <img
-            src={card.item.src}
-            alt={card.item.title}
-            draggable={false}
-            className={styles.cardImage}
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className={styles.cardFallback}>
-            <div className={styles.circuitGrid} />
-          </div>
-        )}
+        <img
+          src={card.item.src}
+          alt=""
+          draggable={false}
+          className={styles.cardImage}
+          onError={(e) => {
+            (e.currentTarget as HTMLElement).style.display = "none";
+          }}
+        />
         <div className={styles.cardOverlay}>
           <span className={styles.cardCategory}>{card.item.category}</span>
           <span className={styles.cardTitle}>{card.item.title}</span>

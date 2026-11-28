@@ -88,6 +88,7 @@ My long-term goal is to build a career in VLSI and hardware engineering, develop
                   className={styles.profileImage} 
                   priority
                   quality={85}
+                  unoptimized
                 />
               ) : (
                 <div className={styles.placeholderPhoto}>

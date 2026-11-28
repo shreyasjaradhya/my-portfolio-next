@@ -52,6 +52,7 @@ export default function ProjectReportContent({
               sizes="(max-width: 1024px) 100vw, 900px"
               priority
               quality={80}
+              unoptimized
             />
             <div className={styles.bannerOverlay} />
           </div>

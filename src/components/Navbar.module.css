@@ -168,7 +168,7 @@
   display: none;
 }
 
-@media (min-width: 1420px) {
+@media (min-width: 1536px) {
   .socialBtn {
     width: auto;
     height: auto;

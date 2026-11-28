@@ -11,7 +11,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import GuideAssistant from "@/components/guide/GuideAssistant";
-import ASMRStaticBackground from "@/components/ASMRStaticBackground";
+import WinterTheme from "@/components/WinterTheme";
 import { createPublicClient } from "@/lib/supabase/server";
 
 import { 
@@ -52,7 +52,7 @@ export default async function Home() {
 
   return (
     <>
-      <ASMRStaticBackground />
+      <WinterTheme />
       <Navbar profile={profileRes.data} />
       <main>
         <Hero profile={profileRes.data} />

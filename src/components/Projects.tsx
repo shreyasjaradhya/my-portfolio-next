@@ -129,6 +129,7 @@ export default function Projects({ projects }: { projects: Project[] }) {
                         className={styles.projectImage}
                         priority={idx < 3}
                         quality={75}
+                        unoptimized
                       />
                     </>
                   ) : (

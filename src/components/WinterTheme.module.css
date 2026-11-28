@@ -1,0 +1,468 @@
+/* WinterTheme.module.css */
+
+.winterContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------
+   1. PHOTOREALISTIC CELESTIAL MOON
+   ------------------------------------------------------------- */
+.moonWrapper {
+  position: fixed;
+  top: 96px;
+  right: 5vw;
+  width: 96px;
+  height: 96px;
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 0.3s ease, opacity 0.5s ease;
+  animation: moonFloat 12s ease-in-out infinite alternate;
+}
+
+@media (max-width: 768px) {
+  .moonWrapper {
+    top: 80px;
+    right: 4vw;
+    width: 68px;
+    height: 68px;
+  }
+}
+
+/* Outer expansive celestial moonlight halo */
+.moonHaloOuter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(186, 230, 253, 0.18) 0%,
+    rgba(56, 189, 248, 0.08) 40%,
+    rgba(14, 165, 233, 0.03) 65%,
+    transparent 80%
+  );
+  filter: blur(18px);
+  animation: haloPulse 8s ease-in-out infinite alternate;
+}
+
+/* Mid halo */
+.moonHaloMid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(224, 242, 254, 0.32) 0%,
+    rgba(186, 230, 253, 0.16) 50%,
+    transparent 75%
+  );
+  filter: blur(10px);
+}
+
+/* Inner crisp halo */
+.moonHaloInner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(240, 249, 255, 0.5) 0%,
+    rgba(186, 230, 253, 0.28) 45%,
+    transparent 70%
+  );
+  filter: blur(6px);
+}
+
+/* Lunar orb body */
+.moonBody {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 25px 4px rgba(224, 242, 254, 0.5),
+    0 0 50px 14px rgba(56, 189, 248, 0.22);
+  overflow: hidden;
+}
+
+/* Photorealistic Moon Image (Authentic NASA lunar craters, maria & topography) */
+.moonImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  filter: contrast(1.08) brightness(1.04);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Delicate 3D limb lighting around the lunar sphere */
+.moonLimbGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset -2px -2px 10px rgba(186, 230, 253, 0.5),
+    inset 2px 2px 8px rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+}
+
+/* Moon surface frost sheen */
+.moonFrostSheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------
+   2. SNOWFALL CANVAS (Realistic 60FPS Snowflake Engine)
+   ------------------------------------------------------------- */
+.snowCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* -------------------------------------------------------------
+   3. GROUND SNOW DRIFT (ACCUMULATED REALISTIC SNOW ON GROUND)
+   ------------------------------------------------------------- */
+.groundSnowWrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Base glowing frosty fog rising from the ground */
+.groundMist {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(
+    to top,
+    rgba(186, 230, 253, 0.16) 0%,
+    rgba(56, 189, 248, 0.05) 45%,
+    transparent 100%
+  );
+}
+
+/* Undulating realistic snow banks SVG */
+.snowbankSvg {
+  width: 100%;
+  height: 58px;
+  display: block;
+  filter: drop-shadow(0 -4px 10px rgba(186, 230, 253, 0.28));
+}
+
+@media (max-width: 768px) {
+  .snowbankSvg {
+    height: 40px;
+  }
+}
+
+/* Ground sparkle stars catching the moonlight */
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 7px 2px #bae6fd;
+  animation: sparkleTwinkle 3.2s ease-in-out infinite alternate;
+}
+
+/* -------------------------------------------------------------
+   4. WINTER THEME BADGE / QUICK TOGGLE PILL
+   ------------------------------------------------------------- */
+/* -------------------------------------------------------------
+   4. WINTER THEME SKY TOGGLE SWITCH (BOTTOM LEFT FLOAT)
+   ------------------------------------------------------------- */
+.switchFloatCard {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 5px;
+  background: rgba(10, 15, 30, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(186, 230, 253, 0.25);
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.2);
+  pointer-events: auto;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.switchFloatCard:hover {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(186, 230, 253, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
+}
+
+.switchLabel {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.switchLabelActive {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #38bdf8;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+}
+
+/* -------------------------------------------------------------
+   5. WINTER MUSIC BUTTON & AUDIO CONTROLS (WINTER ONLY)
+   ------------------------------------------------------------- */
+.musicDivider {
+  width: 1px;
+  height: 16px;
+  background: rgba(186, 230, 253, 0.24);
+  margin: 0 3px;
+}
+
+.musicButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(186, 230, 253, 0.28);
+  border-radius: 9999px;
+  color: #bae6fd;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  line-height: 1;
+}
+
+.musicButton:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.65);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
+}
+
+.musicButtonPlaying {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+}
+
+.musicNoteIcon {
+  display: inline-block;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.musicText {
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.musicPlayState {
+  font-size: 0.58rem;
+  opacity: 0.9;
+  margin-left: 1px;
+}
+
+/* Equalizer Dancing Audio Bars */
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 10px;
+}
+
+.eqBar {
+  width: 2px;
+  background: #38bdf8;
+  border-radius: 1px;
+  box-shadow: 0 0 3px #38bdf8;
+  animation: eqBounce 0.8s ease-in-out infinite alternate;
+}
+
+.eqBar:nth-child(1) {
+  height: 3px;
+  animation-delay: 0.05s;
+}
+
+.eqBar:nth-child(2) {
+  height: 10px;
+  animation-delay: 0.35s;
+}
+
+.eqBar:nth-child(3) {
+  height: 5px;
+  animation-delay: 0.18s;
+}
+
+.eqBar:nth-child(4) {
+  height: 8px;
+  animation-delay: 0.48s;
+}
+
+@keyframes eqBounce {
+  0% {
+    height: 2px;
+    opacity: 0.6;
+  }
+  100% {
+    height: 10px;
+    opacity: 1;
+  }
+}
+
+
+
+.togglePill {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  background: rgba(10, 15, 30, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(186, 230, 253, 0.28);
+  border-radius: 9999px;
+  color: #e0f2fe;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 14px rgba(56, 189, 248, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.togglePill:hover {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(186, 230, 253, 0.5);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45), 0 0 20px rgba(56, 189, 248, 0.4);
+  transform: translateY(-2px);
+}
+
+.togglePillActive {
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #38bdf8;
+}
+
+.togglePillOff {
+  opacity: 0.65;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+
+.snowflakeIcon {
+  display: inline-block;
+  animation: spinSlow 14s linear infinite;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.statusDotOff {
+  background: #64748b;
+  box-shadow: none;
+}
+
+/* -------------------------------------------------------------
+   ANIMATIONS
+   ------------------------------------------------------------- */
+@keyframes moonFloat {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-8px) rotate(1.2deg);
+  }
+}
+
+@keyframes haloPulse {
+  0% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

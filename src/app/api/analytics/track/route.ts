@@ -152,12 +152,12 @@ export async function POST(req: Request) {
       }
 
       console.warn("Analytics insertion warning:", insertError.message);
-      return NextResponse.json({ success: false, error: insertError.message }, { status: 500 });
+      return NextResponse.json({ success: false, recorded: false, error: insertError.message }, { status: 200 });
     }
 
     return NextResponse.json({ success: true, recorded: true, isAdmin });
   } catch (err: any) {
-    console.error("Unhandled analytics tracking error:", err);
-    return NextResponse.json({ error: "Internal tracking error" }, { status: 500 });
+    console.warn("Unhandled analytics tracking error:", err?.message);
+    return NextResponse.json({ success: false, recorded: false }, { status: 200 });
   }
 }
